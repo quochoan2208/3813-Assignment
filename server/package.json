@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/quochoan2208/week4.git"
+    "url": "git+https://github.com/quochoan2208/3813-Assignment.git"
   },
   "author": "quoc hoan hoang",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/quochoan2208/week4/issues"
+    "url": "https://github.com/quochoan2208/3813-Assignment/issues"
   },
-  "homepage": "https://github.com/quochoan2208/week4#readme",
+  "homepage": "https://github.com/quochoan2208/3813-Assignment#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
