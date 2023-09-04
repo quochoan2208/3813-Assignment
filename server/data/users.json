@@ -1,0 +1,6 @@
+
+{"people":[
+    { "email": "abc@com.au", "pwd": "123", "id": 1, "username": "allan", "role": "SUP" },
+    { "email": "abd@com.au", "pwd": "123", "id": 2, "username": "Jodi", "role": "GRO" },
+    { "email": "abe@com.au", "pwd": "123", "id": 3, "username": "Sarah", "role":"USER" }]
+}

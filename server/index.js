@@ -1,45 +1,44 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
+const PORT = 3000;
+const cors = require('cors'); 
+const path = require('path');
+const {authPage, authRole} = require ('./middleware/basicAuth.js');
+const userData = require('./data/users.json').people; 
 
 const bodyParser = require('body-parser');
+app.use(cors());
+app.get('/',(req,res)=> {
+  res.send('Homepage!')
+})
 
-app.use(express.static(__dirname + '/www'));
+app.use('/images',express.static('userimages'));
+
+var fs = require('fs');
+const formidable = require('formidable');
+app.use (express.json()); 
 app.use(bodyParser.json());
+const route = express.Router();
 
-app.get('/', function (req, res) {
-    res.sendFile(__dirname + "/www/form.html");
-    // res.send('This is the authentication route.');
-});
-app.get('/api/auth', (req, res) => {
-    res.send('This is the authentication route.');
-  });
-  
-app.post('/api/login', function (req, res) {
-    let users = [
-        { email: 'abc@gmail.com.au', birthday: '12/08/2000', age: 18, pwd: '123',valid: true  },
-        { email: 'zyz@gmail.com.au', birthday: '11/05/2001', age: 28, pwd: '262',valid: false  },
-        { email: 'abc@gmail.com.au', birthday: '19/02/2003', age: 38, pwd: '356',valid: true  },
-    ];
-    if (!req.body) {
-        return res.sendStatus(400);
-    }
-    var customer = {};
-    customer.email = req.body.email;
-    customer.upwd = req.body.upwd;
-    customer.valid = false;
-    for (let i = 0; i < users.length; i++) {
-        if (req.body.email === users[i].email && req.body.upwd === users[i].pwd) {
-            customer.valid = true;
-            break;
-        }
-    }
-    res.send(customer);
-});
 
-app.listen(3000, () => {
-    var d = new Date();
-    var n = d.getHours();
-    var m = d.getMinutes();
-    console.log("Server has been started at: " + n + ":" + m);
-});
+// app.get('/getlists', authPage(['SUP','GRO']), (req, res, next) => {
+//   console.log('Handling GET /getlists');
+//   res.send('Get list Student');
+// })
+app.get('/dashboard',authPage,(req,res,next)=>{
+  res.send('Welcome to dashboard')
+})
+app.get('/groupadmin',authPage,authRole(["GRO","SUP"]),(req,res,next)=>{
+  res.send('Welcome to Group admin')
+})
+app.get('/admin',authPage,authRole("SUP"),(req,res,next)=>{
+  res.send('Welcome to admin')
+})
+// route.get('/:number',(req,res,next)=> {
+//   res.send('You have permission to access this course!');
+// })
+require('./routes/api-login.js')(app,path,fs);
+
+
+require('./listen.js')(http,PORT);

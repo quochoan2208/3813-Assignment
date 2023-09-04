@@ -1,0 +1,12 @@
+GET http://localhost:3000/groupadmin
+Content-Type: application/json
+
+{
+  "email": "abd@com.au",
+  "pwd": "123"
+}
+
+
+# {
+#     "userEmail":  "abc@com.au"
+# }
