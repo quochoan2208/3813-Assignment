@@ -1,29 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-          <label for="username" >Email address</label>
-          <input type="email" class="form-control" id="username" aria-describedby="emailHelp" placeholder="Enter email" formControlName="username" >
-          <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" placeholder="Password" formControlName="password">
-        </div>
-        <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="exampleCheck1">
-          <label class="form-check-label" for="exampleCheck1">Check me out</label>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+<div class="card">
+  <h4 class="card-header">Login</h4>
+  <div class="card-body" *ngIf="!loggedin">
+      <form  (submit)="signin($event)">
+          <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input type="text" [(ngModel)]="email" name="email" class="form-control"  />
+            
+          </div>
+          <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input type="password" [(ngModel)]="pwd" name="pwd" class="form-control"  />
+            
+          </div>
+          <div class="mb-3">
+              
+              <button type="button" class="btn btn-primary" type="submit">Submit</button>
+             
+          </div>
+          
+          <div id="errormsg">{{errormsg}}</div>
       </form>
-</body>
-</html>
-
-  
+  </div>
+  <div class="card-body" *ngIf="loggedin">
+      <h3> You are already logged in.</h3>
+      <a href="/home" >Home</a>
+  </div>
+</div>

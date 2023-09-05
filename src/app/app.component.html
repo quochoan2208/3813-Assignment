@@ -12,7 +12,12 @@
     <ul class="nav navbar-nav">
     <li class="active"><a class="nav-link" routerLink="/">Home</a></li>
     <li> <a class="nav-link" routerLink="/login">login</a></li>
-    <li><a class="nav-link" routerLink="/account">Account</a></li>
+    <!-- <li><a class="nav-link" routerLink="/account">Account</a></li> -->
+    <li><a class="nav-link" routerLink="/profile">Profile</a></li>
+
+    <li class="nav-item">
+      <a class="nav-link " href="" (click) ="logout($event)">Logout</a>
+    </li>
     </ul>
     </div>
     </nav>
@@ -20,6 +25,7 @@
       <!-- <app-login></app-login>
       <app-account></app-account> -->
     <router-outlet></router-outlet>
+  
     </div>
   
 </body>
