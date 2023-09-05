@@ -6,6 +6,14 @@ const cors = require('cors');
 const path = require('path');
 const {authPage, authRole} = require ('./middleware/basicAuth.js');
 const userData = require('./data/users.json').people; 
+const io = require('socket.io')(http,{
+  cors: {
+    origin: 'http://localhost:4200',
+    methods: ["GET","POST"]
+  }
+})
+const sockets = require('./routes/socket.js');
+sockets.connect(io, PORT);
 
 const bodyParser = require('body-parser');
 app.use(cors());
@@ -22,17 +30,13 @@ app.use(bodyParser.json());
 const route = express.Router();
 
 
-// app.get('/getlists', authPage(['SUP','GRO']), (req, res, next) => {
-//   console.log('Handling GET /getlists');
-//   res.send('Get list Student');
-// })
-app.get('/dashboard',authPage,(req,res,next)=>{
+app.get('/USER',authPage,(req,res,next)=>{
   res.send('Welcome to dashboard')
 })
-app.get('/groupadmin',authPage,authRole(["GRO","SUP"]),(req,res,next)=>{
+app.get('/GRO',authPage,authRole(["GRO","SUP"]),(req,res,next)=>{
   res.send('Welcome to Group admin')
 })
-app.get('/admin',authPage,authRole("SUP"),(req,res,next)=>{
+app.get('/SUP',authPage,authRole("SUP"),(req,res,next)=>{
   res.send('Welcome to admin')
 })
 // route.get('/:number',(req,res,next)=> {

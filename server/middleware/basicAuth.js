@@ -23,29 +23,7 @@ function authPage(req, res, next) {
 
   next();
 }
-// function authRole(roles) {
-//   return (req, res, next) => {
-//     const { user } = req; // Lấy thông tin người dùng từ yêu cầu, bạn đã thiết lập nó trong middleware authPage
-//     if (!user ) {
-//       res.status(401);
-//       return res.send('Not allowed');
-//     }
-//     const userRoles = Array.isArray(user.role) ? user.role : [user.role]
-//     if (!Array.isArray(user.role)) {
-//       roles = [roles]
-//     }
 
-//     if (!roles.some(role => userRoles.include(role))) {
-//       res.status(401);
-//       return res.send('Not allowed');
-//     }
-//     // if (!authorized) {
-//     //   res.status(401);
-//     //   return res.send('Not allowed');
-//     // }
-//     next();
-//   };
-// }
 
 function authRole(roles) {
   return (req, res, next) => {

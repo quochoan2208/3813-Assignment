@@ -21,12 +21,14 @@ module.exports = function (app,path,fs) {
             customer.valid = false;
             customer.email = '';
             customer.username = '';
+            customer.role = '';
     
             for (let i = 0; i < users.length; i++) {
                 if (req.body.email == users[i].email && req.body.upwd == users[i].pwd) {
                     customer.valid = true;
                     customer.email = users[i].email;
                     customer.username = users[i].username;
+                    customer.role = users[i].role;
     
                 }
             }
@@ -37,11 +39,7 @@ module.exports = function (app,path,fs) {
             }
               
            })
-        // let users = [
-        //     { 'email': 'abc@com.au', 'pwd': '123', 'id': 1, 'username': 'allan' },
-        //     { 'email': 'abd@com.au', 'pwd': '123', 'id': 2, 'username': 'Jodi' },
-        //     { 'email': 'abe@com.au', 'pwd': '123', 'id': 3, 'username': 'Sarah' }]
-
+     
        
 
        
