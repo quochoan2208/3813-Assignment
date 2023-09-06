@@ -22,18 +22,7 @@ export class SocketService {
     });
 
   }
-  // joinRoom(roomId: string) {
-  //   // Gửi yêu cầu tham gia vào phòng đến máy chủ
-  //   this.socket.emit('joinRoom', roomId);
-  // }
-  // // Trong socket.service.ts
-  // roomJoined(): Observable<any> {
-  //   return new Observable((observer) => {
-  //     this.socket.on('joinRoomSuccess', (response: any) => {
-  //       observer.next(response);
-  //     });
-  //   });
-  // }
+
   joinRoom(roomId: string) {
     this.socket.emit('joinRoom', roomId); // Gửi yêu cầu tham gia phòng đến máy chủ
   }
@@ -49,7 +38,20 @@ export class SocketService {
       });
     });
   }
- 
+  leaveRoom(roomId: string) {
+    this.socket.emit('leaveRoom', roomId);
+  }
+  roomLeft(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('leaveRoomSuccess', (room: any) => {
+        observer.next({ success: true, room }); // Lắng nghe thông báo rời phòng thành công
+      });
+  
+      this.socket.on('leaveRoomError', (error: any) => {
+        observer.next({ success: false, error }); // Lắng nghe thông báo lỗi khi rời phòng
+      });
+    });
+  }
   
   
 

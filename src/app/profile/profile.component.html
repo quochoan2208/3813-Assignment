@@ -55,6 +55,8 @@
           {{ room.name }}
           <!-- Thêm nút "Join" cho mỗi phòng và gắn sự kiện click để tham gia vào phòng -->
           <button (click)="joinRoom(room.id)">Join</button>
+          <button (click)="leaveRoom(room.id)">Rời phòng</button>
+
         </li>
       </ul>
     </div>

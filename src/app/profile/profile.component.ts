@@ -70,6 +70,25 @@ export class ProfileComponent implements OnInit{
       this.roomsWithChannels = data;
     });
   }
+  leaveRoom(roomId: string) {
+    this.socketService.leaveRoom(roomId);
+  
+    this.socketService.roomLeft().subscribe((response: any) => {
+      if (response.success) {
+        // Rời phòng thành công
+        console.log(`You have left room: ${response.room.name}`);
+        // Hiển thị thông báo xác nhận cho người dùng
+      } else {
+        // Rời phòng thất bại
+        console.error(`Failed to leave room: ${response.error}`);
+        // Hiển thị thông báo lỗi cho người dùng
+      }
+    });
+    this.socketService.getRoomList().subscribe((data) => {
+      this.roomsWithChannels = data;
+    });
+    console.log(this.rooms)
+  }
   joinRoom(roomId: string) {
     // Gửi yêu cầu tham gia vào phòng đến máy chủ
     if (roomId) {
@@ -90,6 +109,10 @@ export class ProfileComponent implements OnInit{
     } else {
       console.error('Room ID is invalid.');
     }
+    this.socketService.getRoomList().subscribe((data) => {
+      this.roomsWithChannels = data;
+    });
+    console.log(this.rooms)
   }
   
   confirmDeleteRoom() {
@@ -102,6 +125,8 @@ export class ProfileComponent implements OnInit{
     // Gọi phương thức tạo kênh từ SocketService
     this.socketService.createChannel(this.newChannelName, roomId);
   }
+
+  
   
  
 
