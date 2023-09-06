@@ -55,9 +55,44 @@ export class SocketService {
     });
   }
  // Trong file socket.service.ts
-addUser(newUser: User) {
-  this.socket.emit('addUser', newUser); // Gửi yêu cầu thêm người dùng mới đến máy chủ
-}
+  addUser(newUser: User) {
+    this.socket.emit('addUser', newUser); // Gửi yêu cầu thêm người dùng mới đến máy chủ
+  }
+  deleteUser(userId: number) {
+    // Gửi yêu cầu xóa người dùng đến máy chủ thông qua socket
+    this.socket.emit('deleteUser', userId);
+  }
+  userDeleted() {
+    // Lắng nghe sự kiện khi người dùng đã bị xóa thành công và trả về sự kiện đó dưới dạng Observable
+    return new Observable<number>((observer) => {
+      this.socket.on('userDeleted', (deletedUserId: number) => {
+        observer.next(deletedUserId);
+      });
+    });
+  }
+  userDeleteError() {
+    // Lắng nghe sự kiện khi xóa người dùng thất bại và trả về sự kiện đó dưới dạng Observable
+    return new Observable<string>((observer) => {
+      this.socket.on('userDeleteError', (error: string) => {
+        observer.next(error);
+      });
+    });
+
+    
+  }
+  getUsersList(): Observable<any[]> {
+    return new Observable<any[]>((observer) => {
+      // Gửi yêu cầu lấy danh sách người dùng đến máy chủ socket
+      this.socket.emit('getUsersList');
+
+      // Lắng nghe sự kiện khi máy chủ socket trả về danh sách người dùng
+      this.socket.on('usersList', (data: any[]) => {
+        observer.next(data);
+      });
+    });
+  }
+  
+  
 
   
   

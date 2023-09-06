@@ -37,7 +37,8 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.email, this.pwd).subscribe({
       next: (data) => {
         if (data.valid == true) {
-          this.newuser = new User(data.username, data.email,data.pwd,data.valid,data.avatar,data.role);
+          this.newuser = new User(data.username, data.email, data.pwd, data.valid, data.avatar, data.role, data.id);
+
           this.authService.setCurrentuser(this.newuser);
           this.router.navigate(['/home']);
         } else {

@@ -32,6 +32,8 @@ export class ProfileComponent implements OnInit{
   newUsername: string = "";
   newEmail: string ="";
   newPassword: string ="";
+  users: any[] = [];
+  index = this.users.length + 1;
   
   private authService = inject(AuthService);
   selectedfile:any = null;
@@ -135,8 +137,13 @@ export class ProfileComponent implements OnInit{
     // Gọi phương thức tạo kênh từ SocketService
     this.socketService.createChannel(this.newChannelName, roomId);
   }
+  deleteUser(userId: number) {
+    this.socketService.deleteUser(userId);
+  }
+  
 
   createUser() {
+    
     // Kiểm tra xem các trường thông tin người dùng có được điền đầy đủ không
     if (this.newUsername && this.newEmail && this.newPassword) {
       // Tạo một đối tượng người dùng mới từ thông tin đã nhập
@@ -146,8 +153,11 @@ export class ProfileComponent implements OnInit{
         pwd: this.newPassword,
         valid: true, // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
         avatar: '', // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
-        role: 'USER' // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
+        role: 'USER',
+        id: this.index // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
       };
+      this.index++;
+      
 
       // Gọi phương thức từ socketService để tạo người dùng mới và gửi dữ liệu lên máy chủ
       this.socketService.addUser(newUser);
@@ -166,6 +176,20 @@ export class ProfileComponent implements OnInit{
   ngOnInit(){
     this.currentuser = JSON.parse(this.authService.getCurrentuser() || '{}');
     console.log(this.currentuser);
+    this.socketService.userDeleted().subscribe((deletedUserId: number) => {
+      console.log(`User with ID ${deletedUserId} has been deleted.`);
+      // Cập nhật lại danh sách người dùng nếu cần
+    });
+    this.socketService.getUsersList().subscribe((userList: any[]) => {
+      this.users = userList;
+    });
+
+  
+  
+    this.socketService.userDeleteError().subscribe((error: string) => {
+      console.error(`Failed to delete user: ${error}`);
+      // Hiển thị thông báo lỗi cho người dùng nếu cần
+    });
    
     this.socketService.getRoomList().subscribe((data) => {
       console.log('Updated room list:', data);

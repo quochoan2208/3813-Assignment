@@ -106,6 +106,36 @@ module.exports = {
                   socket.emit('leaveRoomError', 'Room does not exist.');
                 }
               });
+              socket.on('deleteUser', (userId) => {
+                console.log(userData)
+                // Tìm người dùng cần xóa trong danh sách người dùng
+                const userIndex = userData.people.findIndex((user) => user.id === userId);
+              
+                if (userIndex !== -1) {
+                  // Xóa người dùng khỏi danh sách
+                  userData.people.splice(userIndex, 1);
+              
+                  // Ghi lại dữ liệu người dùng vào tệp
+                  fs.writeFileSync(userDataFilePath, JSON.stringify(userData), 'utf8');
+              
+                  // Gửi thông báo xóa người dùng thành công cho máy khách
+                  socket.emit('userDeleted', userId);
+              
+                  console.log(`User with ID ${userId} has been deleted.`);
+                  console.log(userData)
+                } else {
+                  // Gửi thông báo lỗi nếu không tìm thấy người dùng
+                  socket.emit('userDeleteError', 'User not found.');
+                }
+              });
+              socket.on('getUsersList', () => {
+                // Lấy danh sách người dùng từ dữ liệu của bạn (userData)
+                const userList = userData.people;
+            
+                // Gửi danh sách người dùng cho client
+                socket.emit('usersList', userList);
+              });
+              
               
 
 
