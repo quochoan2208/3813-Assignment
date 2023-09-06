@@ -16,13 +16,29 @@ export class ProfileComponent implements OnInit{
   newRoomName: string = '';
   message: string ="";
   receivedMessages: string[] = [];
-  rooms : any[] = ["Room1","Room2","Room3","Room4"];
+  roomToDelete: string = '';
+
+  rooms : any[] = [
+    { id: 1, name: 'Room 1' },
+    { id: 2, name: 'Room 2' },
+    { id: 3, name: 'Room 3' },
+  ];
   constructor(private socketService: SocketService){}
   sendMessage() {
     this.socketService.sendMessage(this.message);
   }
   createRoom(){
     this.socketService.createRoom(this.newRoomName)
+  }
+  deleteRoom(roomId: string) {
+    // Gọi phương thức xóa phòng từ SocketService
+    this.socketService.deleteRoom(roomId);
+  }
+  confirmDeleteRoom() {
+    if (this.roomToDelete) {
+      this.socketService.deleteRoom(this.roomToDelete);
+      this.roomToDelete = ''; // Đặt lại biến để chọn phòng để xóa
+    }
   }
   
  
@@ -41,12 +57,6 @@ export class ProfileComponent implements OnInit{
       this.rooms = rooms;
     });
   }
-
-    // this.socketService.receiveMessage((message) => {
-    // console.log(`Received message: ${message}`);
-    // this.receivedMessages.push(message)
-    
-    //   } 
 
 
    

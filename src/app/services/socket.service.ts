@@ -7,6 +7,7 @@ const SERVER_URL = 'http://localhost:3000';
   providedIn: 'root'
 })
 export class SocketService {
+  private roomDeletedSubject = new Subject<string>();
 
   private socket: any ;
   rooms: any;
@@ -32,16 +33,21 @@ export class SocketService {
     // Gửi yêu cầu thêm phòng mới đến máy chủ
     this.socket.emit('createRoom', room);
   }
-  // roomCreated(callback: (updatedRoomList: string) => void) {
-  //   this.socket.on('updatedRoomList', (updatedRoomList: string) => {
-  //     // Cập nhật danh sách phòng trên giao diện người dùng và gọi callback
-  //     this.rooms = JSON.parse(updatedRoomList);
-    
-  //     callback(updatedRoomList);
-  //   });
-  // }
+
   getRoomList(): Observable<any> {
     return this.roomListSubject.asObservable();
   }
+  deleteRoom(roomId: string) {
+    // Gửi yêu cầu xóa phòng đến máy chủ
+    this.socket.emit('deleteRoom', roomId);
+    
+    // Khi yêu cầu xóa phòng đã được gửi đi thành công, phản hồi lại sự kiện 'roomDeleted' với roomId
+    this.roomDeletedSubject.next(roomId);
+  }
+  roomDeleted(): Observable<string> {
+    return this.roomDeletedSubject.asObservable();
+  }
+  
+  
   
 }

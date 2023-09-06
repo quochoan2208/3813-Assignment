@@ -25,10 +25,24 @@
           <input [(ngModel)]="newRoomName" placeholder="New room name" />
           <button (click)="createRoom()">Create Room</button>
         </div>
-        <select >
-          <option [ngValue]="null">Select Room</option>
-          <option *ngFor="let room of rooms"> {{room}}</option>
-      </select>
+        
+          <select >
+            <option [ngValue]="null">Select Room</option>
+            <option *ngFor="let room of rooms" > {{room.name}}</option>
+
+        </select>
+       
+        
+        
+      <br>
+      <div *ngFor="let room of rooms">
+        {{ room.name }}
+        <button (click)="deleteRoom(room.id)">Delete</button>
+      </div>
+
+
+      <br>
+      <br>
         <button >Admin Action</button>
 
       </div>
