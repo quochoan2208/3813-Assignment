@@ -14,20 +14,20 @@ import { HomeComponent } from './home/home.component';
 const routes: Routes = [{path: 'login',component: LoginComponent},{path: 'account',component: AccountComponent},{path: 'profile',component: ProfileComponent}, {path: 'home',component: HomeComponent}, ]
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    AccountComponent,
-   
-    
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    RouterModule.forRoot(routes),
-    HttpClientModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        AccountComponent,
+    ],
+    providers: [],
+    bootstrap: [AppComponent],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        RouterModule.forRoot(routes),
+        HttpClientModule,
+        HomeComponent,
+        LoginComponent
+    ]
 })
 export class AppModule { }

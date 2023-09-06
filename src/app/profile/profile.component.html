@@ -1,102 +1,113 @@
-<div class="container">
-  <h1>Avatar Upload</h1>
-  <form>
-    <!-- Form elements here -->
-  </form>
 
-  <div class="profile">
-    <!-- User profile information here -->
-  </div>
-
-  <!-- Feature for SUP user -->
-  <div *ngIf="currentuser.role == 'SUP'">
-    <div>
-      <!-- Create Room feature -->
-      <input [(ngModel)]="newRoomName" placeholder="New room name" />
-      <button (click)="createRoom()">Create Room</button>
-    </div>
-
-    <div>
-      <!-- Select Room feature -->
-      <select>
-        <option [ngValue]="null">Select Room</option>
-        <option *ngFor="let room of rooms">{{ room.name }}</option>
-      </select>
-    </div>
-
-    <div *ngFor="let room of rooms">
-      <!-- Delete Room feature -->
-      {{ room.name }}
-      <button (click)="deleteRoom(room.id)">Delete</button>
-
-      <div *ngFor="let channel of room.channels">
-        <!-- Display channel information -->
-        {{ channel.name }}
+<div *ngIf="currentuser.role == 'SUP' || currentuser.role == 'GRO'">
+    <div class="container">
+    <div class="room-channel-list">
+      <div class="for-room">
+        <div class="room-list">
+          <h3>Group Chat</h3>
+          <div *ngFor="let room of rooms">
+            
+            
+            <span (click)="toggleRoomSelection(room.id)">{{ room.name }}</span>
+          
+        
+            <div *ngIf="roomSelections[room.id]">
+              <button (click)="leaveRoom(room.id)">Leave Room</button>
+              <button (click)="joinRoom(room.id)">Join Room</button>
+            </div>
+          </div>
+         </div> 
+        <div>
+       
+          <h3>Create Room</h3>
+          <input [(ngModel)]="newRoomName" placeholder="New room name" />
+          <br>
+          <button (click)="createRoom()">Create Room</button>
+        </div>
+        <div class="creatuser-form" *ngIf="currentuser.role == 'SUP'" >
+          <div [hidden]="!showCreateUserForm">
+            <h3>Create New User</h3>
+          <form (submit)="createUser()">
+            <label for="newUsername">Username:</label>
+            <input type="text" id="newUsername" [(ngModel)]="newUsername" name="newUsername" required>
+        
+            <label for="newEmail">Email:</label>
+            <input type="email" id="newEmail" [(ngModel)]="newEmail" name="newEmail" required>
+        
+            <label for="newPassword">Password:</label>
+            <input type="password" id="newPassword" [(ngModel)]="newPassword" name="newPassword" required>
+        
+            <button type="submit" (click)="turnedon()">Add </button>
+          </form>
+          </div>
+          <button [hidden]="showCreateUserForm"  (click)="turnedon()">create User here!</button>
+          <div class="delete-room">
+            <h3>Delete Room</h3>
+            <select [(ngModel)]="selectedRoomId" name="selectedRoomId">
+              <option [ngValue]="null">Select Room</option>
+              <option *ngFor="let room of rooms" [ngValue]="room.id" >{{ room.name }}</option>
+            </select>
+            <button (click)="deleteSelectedRoom()">Delete </button>
+          </div> 
       </div>
-    </div>
-
-    <div class="channel-list">
-      <!-- Channels in selected room -->
-      <h2>Channels in {{ getSelectedRoomName() }}</h2>
-      <div *ngFor="let channel of selectedRoomChannels">
-        {{ channel.name }}
+      
+        
       </div>
-      <input [(ngModel)]="newChannelName" placeholder="New channel name" />
-      <button (click)="createChannelInSelectedRoom()">Create Channel</button>
+      <div class="for-channel" >
+        <div class="createChannel">
+          <h3>Create New Channel</h3>
+          <select [(ngModel)]="selectedRoomId" name="selectedRoomId">
+            <option [ngValue]="null">Select Room</option>
+            <option *ngFor="let room of rooms" [ngValue]="room.id">{{ room.name }}</option>
+          </select>
+          <input [(ngModel)]="newChannelName" placeholder="New channel name" />
+          <button (click)="createChannelInRoom()">Add </button>
+        </div>
+        <div class="channel-list" *ngIf="selectedRoomChannels">
+          <!-- Channels in selected room -->
+          <h3>Channels in {{ getSelectedRoomName() }}</h3>
+          <div *ngFor="let channel of selectedRoomChannels">
+            {{ channel.name }}
+          </div>
+          <input [(ngModel)]="newChannelName" placeholder="New channel name" />
+          <button (click)="createChannelInSelectedRoom()">Add</button>
+        </div>  
+       
+      </div>
+      
+      
+     
+         
     </div>
+    <div class="box-chat">
+      <div class="message-text"></div>
+      <div class="input-text">
+        <input type="text">
+        <button>Send</button>
+      </div> </div>
+    
+<div class="user-list">
+  <h3>User List</h3>
+  <ul>
+    <li *ngFor="let user of users" >
+      <span (click)="selectUser(user)">{{ user.username }}</span>
+      <button *ngIf="!joinedRoom && selectedUser === user && !actionsCompleted && !hideeverything" (click)="turnedon()">Join Room</button>
 
-    <br>
-    <br>
-    <div>
-      <h2>Room List</h2>
-      <ul>
-        <!-- Sử dụng ngFor để lặp qua danh sách các phòng và hiển thị chúng -->
-        <li *ngFor="let room of rooms">
-          {{ room.name }}
-          <!-- Thêm nút "Join" cho mỗi phòng và gắn sự kiện click để tham gia vào phòng -->
-          <button (click)="joinRoom(room.id)">Join</button>
-          <button (click)="leaveRoom(room.id)">Rời phòng</button>
-
-        </li>
-      </ul>
-    </div>
-    <!-- Trong file profile.component.html -->
-    <div>
-      <h2>Create New User</h2>
-      <form (submit)="createUser()">
-        <label for="newUsername">Username:</label>
-        <input type="text" id="newUsername" [(ngModel)]="newUsername" name="newUsername" required>
-    
-        <label for="newEmail">Email:</label>
-        <input type="email" id="newEmail" [(ngModel)]="newEmail" name="newEmail" required>
-    
-        <label for="newPassword">Password:</label>
-        <input type="password" id="newPassword" [(ngModel)]="newPassword" name="newPassword" required>
-    
-        <button type="submit">Create User</button>
-      </form>
-    </div>
-    
-    <div>
-      <h2>User List</h2>
-      <ul>
-        <li *ngFor="let user of users">
-          <span>{{ user.username }}</span>
-          <button (click)="deleteUser(user.id)">Delete</button>
-        </li>
-      </ul>
-    </div>
-    
+     <div  *ngIf="joinedRoom && selectedUser === user  && !hideeverything">
+        <select #roomSelect>
+          <option [ngValue]="null">Select Room</option>
+          <option *ngFor="let room of rooms" [value]="room.id">{{ room.name }}</option>
+        </select>
+        <button (click)="addUserToRoom(user.id, +roomSelect.value)">Add to Room</button>
+      </div>
 
    
-    
-    
-    
-    
-    
+      <button *ngIf="selectedUser === user && !hideeverything && currentuser.role == 'SUP'" (click)="deleteUser(user.id)">Delete</button>
+    </li>
+  </ul>
+  <div class="tologout"> <a class="nav-link " href="" (click) ="logout($event)">Logout</a> </div>
+</div> 
 
-    <button>Admin Action</button>
-  </div>
-
-  <!-- Other features for different user roles -->
+  
+</div>
 </div>

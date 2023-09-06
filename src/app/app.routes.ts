@@ -9,7 +9,6 @@ export const routes: Routes = [
     {path: 'profile', 
     canActivate:[authGuard],
     loadChildren: () => import('./profile/profile.component').then(mod => mod.ProfileComponent)},
-    {path: 'chat', 
-    canActivate:[authGuard],
-    loadChildren: () => import('./chat/chat.component').then(mod => mod.ChatComponent)},
+    
+    
 ];

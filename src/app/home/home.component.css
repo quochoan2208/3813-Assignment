@@ -1,12 +1,22 @@
-section{
-    display:grid;
-    grid-template-columns:  repeat(auto-fill, minmax(400px, 1fr));
-    gap:1em;
-    
-    background-color:#eaeaea;
-}
+.container {
+    margin-top: 15%;
+   color: aliceblue;
+    text-align: center;
+    width: 300px;
+    background-color: rgb(55, 0, 107);
+    padding: 30px;
+    border-radius:10px ;
+  }
 
-.info{
-    padding:1em;
-
-}
+  a {
+    color: #a8a8a8; /* Màu sắc mặc định của văn bản */
+    transition: color 0.3s ease; /* Hiệu ứng chuyển đổi màu trong 0.3s */
+  }
+  
+  /* Thay đổi màu sắc khi hover qua văn bản */
+  a:hover {
+    color: #e100ff; /* Màu sắc khi hover */
+  }
+  b {
+    color: #36003d;
+  }

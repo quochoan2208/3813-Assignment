@@ -26,6 +26,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     if (localStorage.getItem('currentUser')) {
       this.loggedin = true;
+      
     } else {
       this.loggedin = false;
     }
@@ -40,7 +41,7 @@ export class LoginComponent implements OnInit {
           this.newuser = new User(data.username, data.email, data.pwd, data.valid, data.avatar, data.role, data.id);
 
           this.authService.setCurrentuser(this.newuser);
-          this.router.navigate(['/home']);
+          this.router.navigate(['/profile']);
         } else {
           this.errormsg = 'There is a problem with the credentials';
         }
