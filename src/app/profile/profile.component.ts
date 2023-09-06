@@ -22,6 +22,14 @@ export class ProfileComponent implements OnInit{
   newChannelName: string = '';
   roomsWithChannels: any[] = [];
   selectedRoomId: string = '';
+  selectedUserId: number | null = null;
+  selectedUser: any = null;
+  roomSelected: boolean = false;
+  roomSelections: { [roomId: string]: boolean } = {};
+  showCreateUserForm: boolean = false;
+
+
+
 
   rooms : any[] =  [
     { id: 1, name: 'Room 1', channels: [], users: [] },
@@ -33,19 +41,63 @@ export class ProfileComponent implements OnInit{
   newEmail: string ="";
   newPassword: string ="";
   users: any[] = [];
-  index = this.users.length + 1;
+  index: any;
+  channelList: { roomId: string, channels: string[] }[] = [];
+  canAddToRoom: boolean = false;
+  actionsCompleted: boolean = false;
+  indexclick = 0;
+  hideeverything = false;
+  indexcheck = 0;
+
+ 
+  joinedRoom: boolean = false;
+
   
   private authService = inject(AuthService);
   selectedfile:any = null;
   imagepath:String ="";
   currentuser:User = new User();
+
   constructor(private socketService: SocketService){}
   sendMessage() {
     this.socketService.sendMessage(this.message);
   }
+  updateSelectedRoom(userId: number, roomId: any) {
+   
+    this.selectedRoomId = roomId;
+  }
+  selectUser(user: any) {
+    this.selectedUser = user;
+    this.indexclick ++;
+    if (this.indexclick % 2 == 0) {
+      this.hideeverything = true;
+    }else {
+      this.hideeverything = false;
+
+    }
+  }
+  allowAddToRoom() {
+    this.canAddToRoom = true;
+  }
+ 
+toggleRoomSelection(roomId: string) {
+  
+  if (this.roomSelections[roomId]) {
+    this.roomSelections[roomId] = false;
+  } else {
+
+    this.roomSelections[roomId] = true;
+  }
+}
+
+  
+  
+  
+  
   selectRoom(roomId: string) {
     this.selectedRoomId = roomId;
-    // Cập nhật danh sách kênh của phòng đang được chọn
+    this.roomSelected = true;
+    
     const selectedRoom = this.roomsWithChannels.find((room) => room.id === roomId);
     if (selectedRoom) {
       this.selectedRoomChannels = selectedRoom.channels;
@@ -54,18 +106,53 @@ export class ProfileComponent implements OnInit{
   createChannelInSelectedRoom() {
     if (this.selectedRoomId && this.newChannelName) {
       this.socketService.createChannel(this.newChannelName, this.selectedRoomId);
+  
+  
+      const selectedRoomIndex = this.channelList.findIndex(room => room.roomId === this.selectedRoomId);
+      if (selectedRoomIndex !== -1) {
+        this.channelList[selectedRoomIndex].channels.push(this.newChannelName);
+      } else {
+        this.channelList.push({ roomId: this.selectedRoomId, channels: [this.newChannelName] });
+      }
+  
+     
+      this.newChannelName = '';
     }
   }
+  turnedon(){
+    this.joinedRoom = true;
+   
+    this.indexcheck ++;
+    if (this.indexcheck % 2 == 0){
+      this.showCreateUserForm =false;
+
+    }
+    else{
+      this.showCreateUserForm =true;
+    }
+    
+    
+    
+  }
+
+  channelExists(roomId: string, channelName: string): boolean {
+    const selectedRoom = this.channelList.find(room => room.roomId === roomId);
+    return selectedRoom ? selectedRoom.channels.includes(channelName) : false;
+  }
+  
   deleteSelectedRoom() {
     if (this.selectedRoomId) {
       this.socketService.deleteRoom(this.selectedRoomId);
-      this.selectedRoomId = ''; // Đặt lại phòng đang được chọn sau khi xóa
+      this.selectedRoomId = ''; 
     }
   }
   getSelectedRoomName(): string {
     const selectedRoom = this.roomsWithChannels.find((room) => room.id === this.selectedRoomId);
-    return selectedRoom ? selectedRoom.name : 'No room selected';
+    return selectedRoom ? selectedRoom.name : ' room selected';
   }
+  logout(event:any){
+    this.authService.logout(event);
+    }
   
   createRoom(){
     this.socketService.createRoom(this.newRoomName);
@@ -74,7 +161,7 @@ export class ProfileComponent implements OnInit{
     });
   }
   deleteRoom(roomId: string) {
-    // Gọi phương thức xóa phòng từ SocketService
+    
     this.socketService.deleteRoom(roomId);
     this.socketService.getRoomList().subscribe((data) => {
       this.roomsWithChannels = data;
@@ -85,13 +172,13 @@ export class ProfileComponent implements OnInit{
   
     this.socketService.roomLeft().subscribe((response: any) => {
       if (response.success) {
-        // Rời phòng thành công
+       
         console.log(`You have left room: ${response.room.name}`);
-        // Hiển thị thông báo xác nhận cho người dùng
+      
       } else {
-        // Rời phòng thất bại
+        
         console.error(`Failed to leave room: ${response.error}`);
-        // Hiển thị thông báo lỗi cho người dùng
+     
       }
     });
     this.socketService.getRoomList().subscribe((data) => {
@@ -100,21 +187,29 @@ export class ProfileComponent implements OnInit{
     console.log(this.rooms)
   }
   joinRoom(roomId: string) {
-    // Gửi yêu cầu tham gia vào phòng đến máy chủ
+    
+    
     if (roomId) {
       this.socketService.joinRoom(roomId);
+      const selectedRoom = this.rooms.find((room) => room.id === roomId);
+   
+    this.selectedRoomChannels = selectedRoom ? selectedRoom.channels : [];
+    this.socketService.getRoomList().subscribe((data) => {
+      this.roomsWithChannels = data;
+    });
       
-      // Lắng nghe phản hồi từ máy chủ
+    
       this.socketService.roomJoined().subscribe((response: any) => {
         if (response.success) {
-          // Tham gia phòng thành công
+         
           console.log(`You have joined room: ${response.room.name}`);
-          // Hiển thị thông báo xác nhận cho người dùng
+          
         } else {
-          // Tham gia phòng thất bại
+        
           console.error(`Failed to join room: ${response.error}`);
-          // Hiển thị thông báo lỗi cho người dùng
+        
         }
+
       });
     } else {
       console.error('Room ID is invalid.');
@@ -125,50 +220,88 @@ export class ProfileComponent implements OnInit{
     console.log(this.rooms)
   }
   // Trong Angular component
+  selectUserAndRoom(userId: number, roomId: any) {
+    this.selectedUserId = userId;
+    this.selectedRoomId = roomId;
+  }
+  
 
 
   confirmDeleteRoom() {
     if (this.roomToDelete) {
       this.socketService.deleteRoom(this.roomToDelete);
-      this.roomToDelete = ''; // Đặt lại biến để chọn phòng để xóa
+      this.roomToDelete = ''; 
     }
   }
   createChannel(roomId: string) {
-    // Gọi phương thức tạo kênh từ SocketService
+  
     this.socketService.createChannel(this.newChannelName, roomId);
   }
   deleteUser(userId: number) {
-    this.socketService.deleteUser(userId);
-  }
+    const userIndex = this.users.findIndex((user) => user.id === userId);
+    if (userIndex !== -1) {
+    
+      this.users.splice(userIndex, 1);
   
+      
+      this.socketService.deleteUser(userId);
+    } else {
+      
+      console.error('User not found.');
+    }
+  }
+
+  createChannelInRoom() {
+    if (this.selectedRoomId && this.newChannelName) {
+      this.socketService.createChannelInRoom(this.newChannelName, this.selectedRoomId);
+    }
+  }
+
 
   createUser() {
     
-    // Kiểm tra xem các trường thông tin người dùng có được điền đầy đủ không
+   
     if (this.newUsername && this.newEmail && this.newPassword) {
-      // Tạo một đối tượng người dùng mới từ thông tin đã nhập
+      
       const newUser = {
         username: this.newUsername,
         email: this.newEmail,
         pwd: this.newPassword,
-        valid: true, // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
-        avatar: '', // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
+        valid: true, 
+        avatar: '', 
         role: 'USER',
-        id: this.index // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
+        id: this.index 
       };
       this.index++;
+      this.users.push(newUser);
       
 
-      // Gọi phương thức từ socketService để tạo người dùng mới và gửi dữ liệu lên máy chủ
+    
       this.socketService.addUser(newUser);
+      this.newUsername = '';
+      this.newEmail = '';
+      this.newPassword = '';
 
-      // Sau khi gửi yêu cầu tạo người dùng, bạn có thể thực hiện các hành động khác ở đây (ví dụ: hiển thị thông báo, làm mới trang, vv.)
-    } else {
-      // Xử lý trường hợp người dùng chưa điền đầy đủ thông tin
+     
+      
       console.error('Please fill in all fields.');
-      // Hiển thị thông báo lỗi hoặc thực hiện các hành động khác ở đây
+      
     }
   }
+  addUserToRoom(userId: any, roomId: number) {
+    this.actionsCompleted= true;
+    this.socketService.addUserToRoom(userId, roomId);
+    if (roomId !== null && roomId !== undefined) {
+      
+      console.log('Selected Room ID:', roomId - 1);
+      
+    } else {
+      
+      console.error('Please select a room before adding the user.');
+    }
+    
+  }
+  
  
 
 
@@ -178,7 +311,7 @@ export class ProfileComponent implements OnInit{
     console.log(this.currentuser);
     this.socketService.userDeleted().subscribe((deletedUserId: number) => {
       console.log(`User with ID ${deletedUserId} has been deleted.`);
-      // Cập nhật lại danh sách người dùng nếu cần
+      
     });
     this.socketService.getUsersList().subscribe((userList: any[]) => {
       this.users = userList;
@@ -188,7 +321,7 @@ export class ProfileComponent implements OnInit{
   
     this.socketService.userDeleteError().subscribe((error: string) => {
       console.error(`Failed to delete user: ${error}`);
-      // Hiển thị thông báo lỗi cho người dùng nếu cần
+   
     });
    
     this.socketService.getRoomList().subscribe((data) => {

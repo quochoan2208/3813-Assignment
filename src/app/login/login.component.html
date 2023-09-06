@@ -1,5 +1,8 @@
-<div class="card">
-  <h4 class="card-header">Login</h4>
+<div class="card" [hidden]="loggedin" >
+  
+  <div class="container" >
+    <h2>Welcome To <b>MessyMessage</b> </h2>
+<p>Please Login here!</p>
   <div class="card-body" *ngIf="!loggedin">
       <form  (submit)="signin($event)">
           <div class="mb-3">
@@ -23,6 +26,7 @@
   </div>
   <div class="card-body" *ngIf="loggedin">
       <h3> You are already logged in.</h3>
-      <a href="/home" >Home</a>
+      <a href="/profile" >Home</a>
   </div>
+</div>
 </div>

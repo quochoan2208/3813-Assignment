@@ -1,0 +1,235 @@
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    height: 100vh;
+    text-align: center;
+  }
+  
+  
+  .room-channel-list {
+    flex: 1.5;
+    background-color: #2d0061;
+    color: #fff;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  
+  .box-chat {
+    flex: 1.5;
+    
+    padding: 20px;
+    background-color: #1b013a;
+    
+  }
+
+  .user-list {
+    flex: 0.5;
+    background-color: #36393f;
+    color: #fff;
+    padding: 20px;
+    
+  }
+  
+ 
+  .user-list ul {
+    list-style: none;
+    padding: 0;
+    
+  }
+  
+
+  .user-list li {
+    margin-bottom: 10px;
+   
+    text-align: center;
+  }
+  .user-pick {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+
+  button {
+    background-color: #3f005c;
+    color: #fff;
+    border: 2px solid #480057;
+    padding: 2px 12px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+  
+ 
+  button:hover {
+    background-color: #2f0138;
+  }
+  
+
+  .warning-button {
+    background-color: #e74c3c;
+    border: 2px solid #c0392b;
+  }
+
+  .success-button {
+    background-color: #2ecc71;
+    border: 2px solid #27ae60;
+  }
+  
+ 
+  .custom-button {
+    background-color: #9b59b6;
+    border: 2px solid #8e44ad;
+  }
+  
+
+  .custom-button:hover {
+    background-color: #8e44ad;
+  }
+  
+  .room-list {
+    margin-bottom: 20px;
+  }
+
+  .createChannel {
+    margin-top: 20px;
+  }
+ 
+  .channel-list {
+    margin-top: 20px;
+  }
+  
+
+  .delete-room {
+    margin-top: 20px;
+  }
+  
+ 
+  .for-room {
+    background-color: rgba(77, 0, 87, 0.4);
+    margin: 0;
+  }
+  
+  
+  .for-channel {
+    padding: 20px;
+    margin-top: 10px;
+    background-color: rgba(16, 0, 34, 0.4)
+  }
+
+form {
+    max-width: 300px;
+    margin: 0 auto; 
+  }
+  
+
+  label {
+    display: block; 
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+ 
+  
+  
+  
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 80%;
+    padding: 2px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+  }
+  
+ 
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    border-color: #15003d;
+  }
+  
+
+ 
+  
+  
+  button[type="submit"]:hover {
+    background-color: #220042;
+  }
+  .createChannel select {
+    margin: 5px;
+  }
+  input{
+    width: 50%;
+    padding: 2px; 
+    margin-bottom: 15px; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #2e003a; 
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+  }
+  
+  select {
+    width: 50%;
+    padding: 2px; 
+    margin-bottom: 15px; 
+    border: 1px solid #ffe8f5;
+    color: #fff;
+    border-radius: 4px;
+    background-color: #440e4b; 
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+  }
+  
+  select:focus {
+    border-color: #4f0099;
+    background-color: #49005c; 
+  }
+
+h3 {
+    font-size: 24px;
+    color: #7700ff; 
+    border-bottom: 2px solid #2f004e; 
+    padding-bottom: 5px; 
+    margin-top: 20px; 
+  }
+  span {
+    color: #a8a8a8; 
+    transition: color 0.3s ease; 
+  }
+  
+  
+  span:hover {
+    color: #e100ff;
+  }
+  .input-text {
+    height: 10%;
+    background-color: #220042;
+    border: 2px solid #360038;
+    margin-top: 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .input-text input {
+    width: 50%;
+    margin-top: 10px;
+  }
+  .input-text button {
+    padding-top: 1px;
+    
+  }
+  .message-text{
+    height: 90%;
+    background-color: #30008a;
+    border-radius: 4px;
+
+  }
+  .tologout {
+   position:sticky;
+
+  }
