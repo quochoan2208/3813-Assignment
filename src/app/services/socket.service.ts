@@ -12,13 +12,28 @@ export class SocketService {
   private socket: any ;
   rooms: any;
   private roomListSubject = new Subject<any>();
+  roomsWithChannels: any[] = [];
   constructor() {
     // Kết nối đến máy chủ Socket.io ở đây
     this.socket = io(SERVER_URL);
-    this.socket.on('updatedRoomList', (updatedRoomList:any) => {
-      this.rooms = JSON.parse(updatedRoomList);
-      this.roomListSubject.next(this.rooms);
+    this.socket.on('updatedRoomList', (data: any) => {
+      this.roomsWithChannels = data;
+      this.roomListSubject.next(data);
     });
+    // this.socket.on('updatedRoomList', (updatedData: any) => {
+    //   const { rooms, channels } = JSON.parse(updatedData);
+    //   this.roomsWithChannels = rooms;
+    //   this.roomListSubject.next({ rooms, channels });
+    // });
+    // this.socket.on('updatedRoomList', (updatedRoomList:any) => {
+    //   this.rooms = JSON.parse(updatedRoomList);
+    //   this.roomListSubject.next(this.rooms);
+    // });
+    // this.socket.on('updatedRoomList', (updatedData: any) => {
+    //   const { rooms, channels } = JSON.parse(updatedData);
+    //   this.roomsWithChannels = rooms;
+    //   this.roomListSubject.next({ rooms, channels });
+    // });
   }
 
   // Thêm các phương thức để gửi và lắng nghe sự kiện Socket.io
@@ -47,6 +62,11 @@ export class SocketService {
   roomDeleted(): Observable<string> {
     return this.roomDeletedSubject.asObservable();
   }
+  createChannel(channelName: string, roomId: string) {
+    // Gửi yêu cầu tạo kênh mới đến máy chủ
+    this.socket.emit('createChannel', { channelName, roomId });
+  }
+
   
   
   
