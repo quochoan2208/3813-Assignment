@@ -20,21 +20,40 @@ export class SocketService {
       this.roomsWithChannels = data;
       this.roomListSubject.next(data);
     });
-    // this.socket.on('updatedRoomList', (updatedData: any) => {
-    //   const { rooms, channels } = JSON.parse(updatedData);
-    //   this.roomsWithChannels = rooms;
-    //   this.roomListSubject.next({ rooms, channels });
-    // });
-    // this.socket.on('updatedRoomList', (updatedRoomList:any) => {
-    //   this.rooms = JSON.parse(updatedRoomList);
-    //   this.roomListSubject.next(this.rooms);
-    // });
-    // this.socket.on('updatedRoomList', (updatedData: any) => {
-    //   const { rooms, channels } = JSON.parse(updatedData);
-    //   this.roomsWithChannels = rooms;
-    //   this.roomListSubject.next({ rooms, channels });
-    // });
+
   }
+  // joinRoom(roomId: string) {
+  //   // Gửi yêu cầu tham gia vào phòng đến máy chủ
+  //   this.socket.emit('joinRoom', roomId);
+  // }
+  // // Trong socket.service.ts
+  // roomJoined(): Observable<any> {
+  //   return new Observable((observer) => {
+  //     this.socket.on('joinRoomSuccess', (response: any) => {
+  //       observer.next(response);
+  //     });
+  //   });
+  // }
+  joinRoom(roomId: string) {
+    this.socket.emit('joinRoom', roomId); // Gửi yêu cầu tham gia phòng đến máy chủ
+  }
+  
+  roomJoined(): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on('joinRoomSuccess', (room: any) => {
+        observer.next({ success: true, room }); // Lắng nghe thông báo tham gia phòng thành công
+      });
+  
+      this.socket.on('joinRoomError', (error: any) => {
+        observer.next({ success: false, error });// Lắng nghe thông báo lỗi khi tham gia phòng
+      });
+    });
+  }
+ 
+  
+  
+
+  
 
   // Thêm các phương thức để gửi và lắng nghe sự kiện Socket.io
   sendMessage(message: string) {

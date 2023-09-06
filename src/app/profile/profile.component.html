@@ -45,6 +45,26 @@
       <button (click)="createChannelInSelectedRoom()">Create Channel</button>
     </div>
 
+    <br>
+    <br>
+    <div>
+      <h2>Room List</h2>
+      <ul>
+        <!-- Sử dụng ngFor để lặp qua danh sách các phòng và hiển thị chúng -->
+        <li *ngFor="let room of rooms">
+          {{ room.name }}
+          <!-- Thêm nút "Join" cho mỗi phòng và gắn sự kiện click để tham gia vào phòng -->
+          <button (click)="joinRoom(room.id)">Join</button>
+        </li>
+      </ul>
+    </div>
+   
+    
+    
+    
+    
+    
+
     <button>Admin Action</button>
   </div>
 

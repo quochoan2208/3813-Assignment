@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import {User} from '../user';
 import { SocketService } from '../services/socket.service';
+import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-profile',
@@ -22,9 +24,9 @@ export class ProfileComponent implements OnInit{
   selectedRoomId: string = '';
 
   rooms : any[] =  [
-    { id: 1, name: 'Room 1', channels: [] },
-    { id: 2, name: 'Room 2', channels: [] },
-    { id: 3, name: 'Room 3', channels: [] },
+    { id: 1, name: 'Room 1', channels: [], users: [] },
+    { id: 2, name: 'Room 2', channels: [], users: [] },
+    { id: 3, name: 'Room 3', channels: [], users: [] },
   ];
   selectedRoomChannels: any;
   constructor(private socketService: SocketService){}
@@ -68,6 +70,28 @@ export class ProfileComponent implements OnInit{
       this.roomsWithChannels = data;
     });
   }
+  joinRoom(roomId: string) {
+    // Gửi yêu cầu tham gia vào phòng đến máy chủ
+    if (roomId) {
+      this.socketService.joinRoom(roomId);
+      
+      // Lắng nghe phản hồi từ máy chủ
+      this.socketService.roomJoined().subscribe((response: any) => {
+        if (response.success) {
+          // Tham gia phòng thành công
+          console.log(`You have joined room: ${response.room.name}`);
+          // Hiển thị thông báo xác nhận cho người dùng
+        } else {
+          // Tham gia phòng thất bại
+          console.error(`Failed to join room: ${response.error}`);
+          // Hiển thị thông báo lỗi cho người dùng
+        }
+      });
+    } else {
+      console.error('Room ID is invalid.');
+    }
+  }
+  
   confirmDeleteRoom() {
     if (this.roomToDelete) {
       this.socketService.deleteRoom(this.roomToDelete);
@@ -90,14 +114,7 @@ export class ProfileComponent implements OnInit{
   ngOnInit(){
     this.currentuser = JSON.parse(this.authService.getCurrentuser() || '{}');
     console.log(this.currentuser);
-    // this.socketService.getRoomList().subscribe((rooms) => {
-    //   console.log('Updated room list:', rooms);
-    //   this.rooms = rooms;
-    // });
-    // this.socketService.getRoomList().subscribe((data) => {
-    //   console.log('Updated room list:', data);
-    //   this.roomsWithChannels = data.rooms;
-    // });
+   
     this.socketService.getRoomList().subscribe((data) => {
       console.log('Updated room list:', data);
       this.rooms = data;
