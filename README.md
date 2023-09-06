@@ -274,7 +274,7 @@ users: This attribute is an empty array (users: []). It will be used to store in
 
 # REST API && Angular Document
 
-# Angular Document -->
+# server-side
 
   
 
@@ -354,7 +354,7 @@ Finally, the sendUpdatedRoomList function is used to send the updated room list 
 
  
 
-Angular: 
+# Angular-side: 
 
   
 
@@ -569,7 +569,7 @@ Angular components (components) control the user interface and combine data from
 
   
 
-General comments on how RESTful-API works: 
+#General comments on how RESTful-API works: 
 
   
 
