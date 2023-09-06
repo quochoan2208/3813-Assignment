@@ -60,6 +60,24 @@
         </li>
       </ul>
     </div>
+    <!-- Trong file profile.component.html -->
+    <div>
+      <h2>Create New User</h2>
+      <form (submit)="createUser()">
+        <label for="newUsername">Username:</label>
+        <input type="text" id="newUsername" [(ngModel)]="newUsername" name="newUsername" required>
+    
+        <label for="newEmail">Email:</label>
+        <input type="email" id="newEmail" [(ngModel)]="newEmail" name="newEmail" required>
+    
+        <label for="newPassword">Password:</label>
+        <input type="password" id="newPassword" [(ngModel)]="newPassword" name="newPassword" required>
+    
+        <button type="submit">Create User</button>
+      </form>
+    </div>
+    
+
    
     
     

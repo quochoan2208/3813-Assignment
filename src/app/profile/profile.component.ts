@@ -29,6 +29,14 @@ export class ProfileComponent implements OnInit{
     { id: 3, name: 'Room 3', channels: [], users: [] },
   ];
   selectedRoomChannels: any;
+  newUsername: string = "";
+  newEmail: string ="";
+  newPassword: string ="";
+  
+  private authService = inject(AuthService);
+  selectedfile:any = null;
+  imagepath:String ="";
+  currentuser:User = new User();
   constructor(private socketService: SocketService){}
   sendMessage() {
     this.socketService.sendMessage(this.message);
@@ -114,7 +122,9 @@ export class ProfileComponent implements OnInit{
     });
     console.log(this.rooms)
   }
-  
+  // Trong Angular component
+
+
   confirmDeleteRoom() {
     if (this.roomToDelete) {
       this.socketService.deleteRoom(this.roomToDelete);
@@ -126,15 +136,32 @@ export class ProfileComponent implements OnInit{
     this.socketService.createChannel(this.newChannelName, roomId);
   }
 
-  
-  
+  createUser() {
+    // Kiểm tra xem các trường thông tin người dùng có được điền đầy đủ không
+    if (this.newUsername && this.newEmail && this.newPassword) {
+      // Tạo một đối tượng người dùng mới từ thông tin đã nhập
+      const newUser = {
+        username: this.newUsername,
+        email: this.newEmail,
+        pwd: this.newPassword,
+        valid: true, // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
+        avatar: '', // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
+        role: 'USER' // Đây là một giá trị mặc định, bạn có thể thay đổi nếu cần
+      };
+
+      // Gọi phương thức từ socketService để tạo người dùng mới và gửi dữ liệu lên máy chủ
+      this.socketService.addUser(newUser);
+
+      // Sau khi gửi yêu cầu tạo người dùng, bạn có thể thực hiện các hành động khác ở đây (ví dụ: hiển thị thông báo, làm mới trang, vv.)
+    } else {
+      // Xử lý trường hợp người dùng chưa điền đầy đủ thông tin
+      console.error('Please fill in all fields.');
+      // Hiển thị thông báo lỗi hoặc thực hiện các hành động khác ở đây
+    }
+  }
  
 
 
-  private authService = inject(AuthService);
-  selectedfile:any = null;
-  imagepath:String ="";
-  currentuser:User = new User();
 
   ngOnInit(){
     this.currentuser = JSON.parse(this.authService.getCurrentuser() || '{}');

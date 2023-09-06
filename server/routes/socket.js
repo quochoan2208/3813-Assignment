@@ -1,4 +1,9 @@
+const fs = require('fs');
+const path = require('path');
+const userDataFilePath = path.join(__dirname, '../data/users.json');
+const userData = JSON.parse(fs.readFileSync(userDataFilePath, 'utf8'));
 module.exports = {
+  
 
     connect: function(io,PORT){
       const rooms = [
@@ -66,26 +71,26 @@ module.exports = {
                   socket.emit('joinRoomError', 'You are already in this room.');
                 }
               } else {
-                // Phòng không tồn tại
+                
                 socket.emit('joinRoomError', 'Room does not exist.');
               }
             });
-            // Thêm sự kiện để xử lý yêu cầu rời phòng
-              // socket.on('leaveRoom', (roomId) => {
-              //   const room = rooms.find((room) => room.id === roomId);
-              //   if (room) {
-              //     const userIndex = room.users.indexOf(socket.id);
-              //     if (userIndex !== -1) {
-              //       room.users.splice(userIndex, 1); // Loại bỏ người dùng khỏi danh sách người dùng của phòng
-              //       io.to(roomId).emit('userLeft', socket.id); // Gửi thông báo rời phòng cho tất cả người dùng trong phòng
-              //       socket.emit('leaveRoomSuccess', room); // Gửi phản hồi về việc rời phòng thành công
-              //     } else {
-              //       socket.emit('leaveRoomError', 'You are not in this room.'); // Người dùng không ở trong phòng
-              //     }
-              //   } else {
-              //     socket.emit('leaveRoomError', 'Room does not exist.'); // Phòng không tồn tại
-              //   }
-              // });
+            
+              socket.on('addUser', (newUser) => {
+              
+                userData.people.push(newUser);
+                
+                
+                fs.writeFileSync(userDataFilePath, JSON.stringify(userData), 'utf8');
+
+                
+                io.emit('userAdded', newUser);
+
+                console.log(`User "${newUser.username}" added.`);
+                console.log(userData);
+              });
+
+     
               socket.on('leaveRoom', (roomId) => {
                 const room = rooms.find((room) => room.id === roomId);
                 if (room) {

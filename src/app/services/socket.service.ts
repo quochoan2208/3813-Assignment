@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import {io} from 'socket.io-client';
 const SERVER_URL = 'http://localhost:3000';
+import { User } from '../user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
   private roomDeletedSubject = new Subject<string>();
+  newuser:User = new User();
 
   private socket: any ;
   rooms: any;
@@ -52,6 +54,11 @@ export class SocketService {
       });
     });
   }
+ // Trong file socket.service.ts
+addUser(newUser: User) {
+  this.socket.emit('addUser', newUser); // Gửi yêu cầu thêm người dùng mới đến máy chủ
+}
+
   
   
 
