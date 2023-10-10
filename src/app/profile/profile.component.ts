@@ -17,6 +17,7 @@ import { Observable } from 'rxjs';
 export class ProfileComponent implements OnInit{
   newRoomName: string = '';
   message: string ="";
+  newuserid : number | null = null;
   receivedMessages: string[] = [];
   roomToDelete: string = '';
   newChannelName: string = '';
@@ -32,9 +33,9 @@ export class ProfileComponent implements OnInit{
 
 
   rooms : any[] =  [
-    { id: 1, name: 'Room 1', channels: [], users: [] },
-    { id: 2, name: 'Room 2', channels: [], users: [] },
-    { id: 3, name: 'Room 3', channels: [], users: [] },
+    // { id: 1, name: 'Room 1', channels: [], users: [] },
+    // { id: 2, name: 'Room 2', channels: [], users: [] },
+    // { id: 3, name: 'Room 3', channels: [], users: [] },
   ];
   selectedRoomChannels: any;
   newUsername: string = "";
@@ -58,7 +59,7 @@ export class ProfileComponent implements OnInit{
   imagepath:String ="";
   currentuser:User = new User();
 
-  constructor(private socketService: SocketService){}
+  constructor(private socketService: SocketService,private auth: AuthService){}
   sendMessage() {
     this.socketService.sendMessage(this.message);
   }
@@ -167,58 +168,36 @@ toggleRoomSelection(roomId: string) {
       this.roomsWithChannels = data;
     });
   }
+
   leaveRoom(roomId: string) {
-    this.socketService.leaveRoom(roomId);
-  
+    this.socketService.leaveRoom(roomId, this.currentuser.id);
+
     this.socketService.roomLeft().subscribe((response: any) => {
       if (response.success) {
-       
         console.log(`You have left room: ${response.room.name}`);
-      
       } else {
-        
         console.error(`Failed to leave room: ${response.error}`);
-     
       }
     });
-    this.socketService.getRoomList().subscribe((data) => {
-      this.roomsWithChannels = data;
-    });
-    console.log(this.rooms)
-  }
-  joinRoom(roomId: string) {
-    
-    
-    if (roomId) {
-      this.socketService.joinRoom(roomId);
-      const selectedRoom = this.rooms.find((room) => room.id === roomId);
-   
-    this.selectedRoomChannels = selectedRoom ? selectedRoom.channels : [];
-    this.socketService.getRoomList().subscribe((data) => {
-      this.roomsWithChannels = data;
-    });
-      
-    
-      this.socketService.roomJoined().subscribe((response: any) => {
-        if (response.success) {
-         
-          console.log(`You have joined room: ${response.room.name}`);
-          
-        } else {
-        
-          console.error(`Failed to join room: ${response.error}`);
-        
-        }
 
-      });
+    // Cập nhật danh sách phòng sau khi rời phòng (nếu cần)
+    this.socketService.getRoomList().subscribe((data) => {
+      // Cập nhật roomsWithChannels hoặc thực hiện các thao tác cần thiết
+    });
+  }
+
+
+  joinRoom(roomId: string) {
+    if (roomId) {
+      
+        this.socketService.joinRoom(roomId, this.currentuser.id);
+       
     } else {
       console.error('Room ID is invalid.');
     }
-    this.socketService.getRoomList().subscribe((data) => {
-      this.roomsWithChannels = data;
-    });
-    console.log(this.rooms)
   }
+
+
   // Trong Angular component
   selectUserAndRoom(userId: number, roomId: any) {
     this.selectedUserId = userId;
@@ -301,6 +280,11 @@ toggleRoomSelection(roomId: string) {
     }
     
   }
+  updateRoomList() {
+    this.socketService.getRoomList().subscribe((data) => {
+      this.roomsWithChannels = data;
+    });
+  }
   
  
 
@@ -309,13 +293,19 @@ toggleRoomSelection(roomId: string) {
   ngOnInit(){
     this.currentuser = JSON.parse(this.authService.getCurrentuser() || '{}');
     console.log(this.currentuser);
+    this.socketService.reqroomList();
+    this.socketService.getroomList((msg:string)=>{ this.rooms = JSON.parse(msg)});
     this.socketService.userDeleted().subscribe((deletedUserId: number) => {
       console.log(`User with ID ${deletedUserId} has been deleted.`);
       
     });
+
     this.socketService.getUsersList().subscribe((userList: any[]) => {
       this.users = userList;
     });
+    this.newuserid = this.authService.getUserId();
+    console.log(this.currentuser.id);
+
 
   
   
@@ -323,11 +313,12 @@ toggleRoomSelection(roomId: string) {
       console.error(`Failed to delete user: ${error}`);
    
     });
-   
+  
     this.socketService.getRoomList().subscribe((data) => {
       console.log('Updated room list:', data);
       this.rooms = data;
     });
+    this.updateRoomList();
     
     
   }

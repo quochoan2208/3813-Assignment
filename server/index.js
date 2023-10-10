@@ -2,6 +2,10 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 const PORT = 3000;
+const mongoose = require('mongoose');
+
+
+
 const cors = require('cors'); 
 const path = require('path');
 const {authPage, authRole} = require ('./middleware/basicAuth.js');
@@ -12,6 +16,8 @@ const io = require('socket.io')(http,{
     methods: ["GET","POST"]
   }
 })
+const datauser = require('./datauser.js')
+
 const sockets = require('./routes/socket.js');
 sockets.connect(io, PORT);
 
@@ -19,7 +25,20 @@ const bodyParser = require('body-parser');
 app.use(cors());
 app.get('/',(req,res)=> {
   res.send('Homepage!')
+ 
 })
+
+findUser();
+async function findUser(){ 
+  try {
+    const Users = await datauser.find();
+    // res.send(Users);
+    console.log(Users)
+} catch (err) {
+    console.error(err);
+   
+}
+}
 
 app.use('/images',express.static('userimages'));
 
@@ -28,6 +47,11 @@ const formidable = require('formidable');
 app.use (express.json()); 
 app.use(bodyParser.json());
 const route = express.Router();
+
+
+
+
+
 
 
 app.get('/USER',authPage,(req,res,next)=>{
@@ -39,9 +63,7 @@ app.get('/GRO',authPage,authRole(["GRO","SUP"]),(req,res,next)=>{
 app.get('/SUP',authPage,authRole("SUP"),(req,res,next)=>{
   res.send('Welcome to admin')
 })
-// route.get('/:number',(req,res,next)=> {
-//   res.send('You have permission to access this course!');
-// })
+
 require('./routes/api-login.js')(app,path,fs);
 
 

@@ -2,163 +2,196 @@ const fs = require('fs');
 const path = require('path');
 const userDataFilePath = path.join(__dirname, '../data/users.json');
 const userData = JSON.parse(fs.readFileSync(userDataFilePath, 'utf8'));
+const roomsDataFilePath = path.join(__dirname, '../data/room.json');
+let rooms = [];
+const User = require('../datauser.js');
+
+if (fs.existsSync(roomsDataFilePath)) {
+  const roomsData = fs.readFileSync(roomsDataFilePath, 'utf8');
+  rooms = JSON.parse(roomsData);
+}
+
 module.exports = {
   
 
     connect: function(io,PORT){
-      const rooms = [
-        { id: 1, name: 'Room 1', channels: [{id: 1, name: 'Channel 2'},{id: 2, name: 'Channel 1'}], users: [] },
-        { id: 2, name: 'Room 2', channels: [{id: 1, name: 'Channel 3'},{id: 2, name: 'Channel 4'}], users: [] },
-        { id: 3, name: 'Room 3', channels: [], users: [] },
-      ];
-  
         io.on('connection', (socket) => {
             console.log('A user connected');
+
+
             function sendUpdatedRoomList() {
                 io.emit('updatedRoomList', rooms);
                 console.log("this is the testing",JSON.stringify(rooms))
               }
-            socket.on('createRoom', (roomName) => {
-              const existingRoom = rooms.find((room) => room.name === roomName);
-              if (existingRoom) {
-              
-                socket.emit('roomCreationError', 'Room with the same name already exists.');
-              } else {
-              const newRoom = {
-                id: rooms.length +1,
-                name: roomName,
-                channels: [],
-                users: [],
-              }
-                
-            
-             
-                rooms.push(newRoom);
-               
-            
-            
-                io.emit('roomCreated', newRoom);
-                sendUpdatedRoomList();
-            
-                console.log(`Room "${newRoom}" created.`);
-                console.log(rooms);
-              }});
-              socket.on('createChannel', (data) => {
-                const { channelName, roomId } = data;
-              
+              socket.on('roomlist',
+              ()=>{
+                socket.emit('roomlist',JSON.stringify(rooms));
+                });
+              socket.on('createRoom', (roomName) => {
+                const existingRoom = rooms.find((room) => room.name === roomName);
+                if (existingRoom) {
+                  socket.emit('roomCreationError', 'Room with the same name already exists.');
+                } else {
+                  const newRoom = {
+                    id: rooms.length + 1,
+                    name: roomName,
+                    channels: [],
+                    users: [],
+                  };
+                  rooms.push(newRoom);
+                  io.emit('roomCreated', newRoom);
+                  sendUpdatedRoomList();
+        
+                  // Ghi dữ liệu mới vào tệp JSON phòng
+                  fs.writeFileSync(roomsDataFilePath, JSON.stringify(rooms), 'utf8');
+        
+                  console.log(`Room "${newRoom.name}" created.`);
+                }
+              });
+              socket.on('joinRoom', ({ roomId, userId }) => {
                 const room = rooms.find((room) => room.id === roomId);
                 if (room) {
-                  const newChannel = {
-                    id: room.channels.length + 1, 
-                    name: channelName,
-                  };
+                  if (!room.users.includes(userId)) {
+                    room.users.push(userId);
+                    io.to(roomId).emit('userJoined', userId);
               
-                  room.channels.push(newChannel);
+                    // Cập nhật thông tin phòng trong mảng `rooms`
+                    const roomIndex = rooms.findIndex((r) => r.id === roomId);
+                    if (roomIndex !== -1) {
+                      rooms[roomIndex] = room;
               
-                  io.to(roomId).emit('channelCreated', newChannel);
-                  sendUpdatedRoomList();
+                      // Ghi dữ liệu phòng vào tệp JSON
+                      fs.writeFileSync(roomsDataFilePath, JSON.stringify(rooms), 'utf8');
+                    }
+                    
+                    socket.emit('joinRoomSuccess', room);
+                  } else {
+                    socket.emit('joinRoomError', 'User is already in this room.');
+                  }
                 } else {
-                  
-                  socket.emit('channelCreationError', 'Room does not exist.');
+                  socket.emit('joinRoomError', 'Room does not exist.');
+                }
+              });
+
+
+              socket.on('addUser', async (newUser) => {
+                try {
+                  const existingUserByName = await User.findOne({ username: newUser.username });
+                  const existingUserByEmail = await User.findOne({ email: newUser.email });
+              
+                  if (existingUserByName) {
+                    socket.emit('userCreationError', 'Username already exists.');
+                  } else if (existingUserByEmail) {
+                    socket.emit('userCreationError', 'Email already exists.');
+                  } else {
+                    // Thêm người dùng mới vào MongoDB
+                    const createdUser = await User.create(newUser);
+                    createdUser.id = User.length + 1;
+                    await createdUser.save();
+              
+                    io.emit('userAdded', createdUser);
+                    console.log(`User "${createdUser.username}" added.`);
+                  }
+                } catch (error) {
+                  console.error(error);
+                  socket.emit('userCreationError', 'Error creating user.');
                 }
               });
               
-            socket.on('joinRoom', (roomId) => {
-              const room = rooms.find((room) => room.id === roomId);
-              if (room) {
+              // socket.on('addUser', (newUser) => {
                 
-                if (!room.users.includes(socket.id)) {
-                 
-                  room.users.push(socket.id);
-                  
-                  io.to(roomId).emit('userJoined', socket.id);
-                  
-                  socket.emit('joinRoomSuccess', room); 
-                } else {
-                  
-                  socket.emit('joinRoomError', 'You are already in this room.');
-                }
-              } else {
-                
-                socket.emit('joinRoomError', 'Room does not exist.');
-              }
-            });
-            
-              
-              socket.on('addUser', (newUser) => {
-                
-                const existingUserByName = userData.people.find((user) => user.username === newUser.username);
+              //   const existingUserByName = userData.people.find((user) => user.username === newUser.username);
               
                 
-                const existingUserByEmail = userData.people.find((user) => user.email === newUser.email);
+              //   const existingUserByEmail = userData.people.find((user) => user.email === newUser.email);
               
-                if (existingUserByName) {
+              //   if (existingUserByName) {
                   
-                  socket.emit('userCreationError', 'Username already exists.');
-                } else if (existingUserByEmail) {
+              //     socket.emit('userCreationError', 'Username already exists.');
+              //   } else if (existingUserByEmail) {
                   
-                  socket.emit('userCreationError', 'Email already exists.');
-                } else {
+              //     socket.emit('userCreationError', 'Email already exists.');
+              //   } else {
               
-                  newUser.id = userData.people.length + 1
-                  userData.people.push(newUser);
+              //     newUser.id = userData.people.length + 1
+              //     userData.people.push(newUser);
               
-                  fs.writeFileSync(userDataFilePath, JSON.stringify(userData), 'utf8');
+              //     fs.writeFileSync(userDataFilePath, JSON.stringify(userData), 'utf8');
               
-                  io.emit('userAdded', newUser);
+              //     io.emit('userAdded', newUser);
               
-                  console.log(`User "${newUser.username}" added.`);
-                  console.log(userData);
-                }
-              });
+              //     console.log(`User "${newUser.username}" added.`);
+              //     console.log(userData);
+              //   }
+              // });
               
-              //Add User To Room
               socket.on('addUserToRoom', ({ userId, roomId }) => {
                 const room = rooms.find((room) => room.id === roomId);
                 if (room) {
                   if (!room.users.includes(userId)) {
                     room.users.push(userId);
                     io.to(roomId).emit('userAddedToRoom', { userId, roomId });
+              
+                    // Cập nhật thông tin phòng trong mảng `rooms`
+                    const roomIndex = rooms.findIndex((r) => r.id === roomId);
+                    if (roomIndex !== -1) {
+                      rooms[roomIndex] = room;
+              
+                      // Ghi dữ liệu phòng vào tệp JSON
+                      fs.writeFileSync(roomsDataFilePath, JSON.stringify(rooms), 'utf8');
+                    }
                   } else {
-                    // Gửi thông báo lỗi nếu người dùng đã có trong phòng
                     socket.emit('userAddToRoomError', 'User is already in this room.');
                   }
                 } else {
-                  // Gửi thông báo lỗi nếu phòng không tồn tại
                   socket.emit('userAddToRoomError', 'Room does not exist.');
                 }
               });
-              // Trong file socket.js
+              
               socket.on('addChannelToRoom', (data) => {
                 const { channelName, roomId } = data;
-
+              
                 const room = rooms.find((room) => room.id === roomId);
                 if (room) {
                   const newChannel = {
                     name: channelName,
                   };
-
+              
                   room.channels.push(newChannel);
-
+              
                   io.to(roomId).emit('channelCreated', newChannel);
                   sendUpdatedRoomList();
+              
+                  // Cập nhật thông tin phòng trong mảng `rooms`
+                  const roomIndex = rooms.findIndex((r) => r.id === roomId);
+                  if (roomIndex !== -1) {
+                    rooms[roomIndex] = room;
+              
+                    // Ghi dữ liệu phòng vào tệp JSON
+                    fs.writeFileSync(roomsDataFilePath, JSON.stringify(rooms), 'utf8');
+                  }
                 } else {
-                  // Gửi thông báo lỗi nếu phòng không tồn tại
                   socket.emit('channelCreationError', 'Room does not exist.');
                 }
               });
 
-              
-
-     
-              socket.on('leaveRoom', (roomId) => {
-                const room = rooms.find((room) => room.id === roomId);
-                if (room) {
-                  const userIndex = room.users.indexOf(socket.id);
+              socket.on('leaveRoom', (roomId, userId) => {
+                const roomIndex = rooms.findIndex((room) => room.id === roomId);
+                if (roomIndex !== -1) {
+                  const userIndex = rooms[roomIndex].users.indexOf(userId);
                   if (userIndex !== -1) {
-                    room.users.splice(userIndex, 1);
-                    io.to(roomId).emit('userLeft', socket.id);
-                    socket.emit('leaveRoomSuccess', room);
+                    rooms[roomIndex].users.splice(userIndex, 1);
+                    io.to(roomId).emit('userLeft', userId);
+                    socket.emit('leaveRoomSuccess', rooms[roomIndex]);
+              
+                    // Cập nhật thông tin phòng trong tệp JSON
+                    fs.writeFileSync(roomsDataFilePath, JSON.stringify(rooms), 'utf8', (err) => {
+                      if (err) {
+                        console.error('Error writing to JSON file:', err);
+                      } else {
+                        console.log('Room data updated successfully.');
+                      }
+                    });
                   } else {
                     socket.emit('leaveRoomError', 'You are not in this room.');
                   }
@@ -166,6 +199,8 @@ module.exports = {
                   socket.emit('leaveRoomError', 'Room does not exist.');
                 }
               });
+              
+              
               socket.on('deleteUser', (userId) => {
                 console.log(userData)
              
@@ -188,13 +223,67 @@ module.exports = {
                   socket.emit('userDeleteError', 'User not found.');
                 }
               });
-              socket.on('getUsersList', () => {
+           
               
-                const userList = userData.people;
+              socket.on('getUsersList', async () => {
+                try {
+                  // Sử dụng Mongoose để lấy danh sách người dùng từ MongoDB
+                  const userList = await User.find({}, '-password'); // '-password' để loại bỏ trường mật khẩu nếu bạn muốn
+              
+                  socket.emit('usersList', userList);
+                } catch (error) {
+                  console.error(error);
+                  socket.emit('usersListError', 'Error getting user list.');
+                }
+              });
+              
+              // socket.on('getUsersList', () => {
+              
+              //   const userList = userData.people;
             
                
-                socket.emit('usersList', userList);
+              //   socket.emit('usersList', userList);
+              // });
+              // socket.on('deleteUser', (userId) => {
+              //   console.log(userData)
+             
+              //   const userIndex = userData.people.findIndex((user) => user.id === userId);
+              
+              //   if (userIndex !== -1) {
+                  
+              //     userData.people.splice(userIndex, 1);
+              
+                 
+              //     fs.writeFileSync(userDataFilePath, JSON.stringify(userData), 'utf8');
+              
+                
+              //     socket.emit('userDeleted', userId);
+              
+              //     console.log(`User with ID ${userId} has been deleted.`);
+              //     console.log(userData)
+              //   } else {
+                  
+              //     socket.emit('userDeleteError', 'User not found.');
+              //   }
+              // });
+
+              socket.on('deleteUser', async (userId) => {
+                try {
+                  const deletedUser = await User.findOneAndRemove({ id: userId });
+              
+                  if (!deletedUser) {
+                    socket.emit('userDeleteError', 'User not found.');
+                  } else {
+                    socket.emit('userDeleted', userId);
+                    console.log(`User with ID ${userId} has been deleted.`);
+                  }
+                } catch (error) {
+                  console.error(error);
+                  socket.emit('userDeleteError', 'Error deleting user.');
+                }
               });
+              
+           
 
               socket.on('addUserToChannel', ({ channelName, roomId, userId }) => {
                 // Tìm phòng theo roomId
@@ -229,26 +318,27 @@ module.exports = {
                 }
               });
               
-              
-              
 
+ 
 
-            
+socket.on('deleteRoom', (roomId) => {
+  const index = rooms.findIndex((room) => room.id === roomId);
+  if (index !== -1) {
+    for (let i = 0; i < rooms.length; i++) {
+      if (rooms[i].id > roomId) {
+        rooms[i].id--;
+      }
+    }
+    rooms.splice(index, 1);
+    io.emit('roomDeleted', roomId);
 
+    // Ghi lại dữ liệu vào file JSON sau khi xóa phòng
+    fs.writeFileSync(roomsDataFilePath, JSON.stringify(rooms), 'utf8');
 
-              socket.on('deleteRoom', (roomId) => {
-        
-                const index = rooms.findIndex((room) => room.id === roomId);
-                if (index !== -1) {
-                  for (let i = 0; i < rooms.length; i++) {
-                    if (rooms[i].id > roomId) {
-                      rooms[i].id--;
-                    }}
-                  rooms.splice(index, 1);
-                  io.emit('roomDeleted', roomId);
-                  sendUpdatedRoomList();
-                }
-              });
+    sendUpdatedRoomList();
+  }
+});
+
           
             socket.on('message', (message) => {
               console.log(`Received message: ${message}`);

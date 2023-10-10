@@ -24,11 +24,19 @@ export class SocketService {
     });
 
   }
-
-  joinRoom(roomId: string) {
-    this.socket.emit('joinRoom', roomId);
+  reqroomList(){
+    this.socket.emit('roomlist','list please');
   }
-  
+
+  getroomList(next:any){
+    this.socket.on('roomlist',(res: any)=>next(res));
+
+  }
+
+  joinRoom(roomId: string, userId: number) {
+    this.socket.emit('joinRoom', { roomId, userId });
+  }
+
   roomJoined(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('joinRoomSuccess', (room: any) => {
@@ -45,9 +53,10 @@ export class SocketService {
     this.socket.emit('addUserToRoom', { userId, roomId });
   }
   
-  leaveRoom(roomId: string) {
-    this.socket.emit('leaveRoom', roomId);
+  leaveRoom(roomId: string, userId: number) {
+    this.socket.emit('leaveRoom', roomId, userId);
   }
+  
   roomLeft(): Observable<any> {
     return new Observable((observer) => {
       this.socket.on('leaveRoomSuccess', (room: any) => {
@@ -112,6 +121,8 @@ export class SocketService {
 
     this.socket.emit('createRoom', room);
   }
+
+
 
   getRoomList(): Observable<any> {
     return this.roomListSubject.asObservable();

@@ -8,6 +8,7 @@ import { User } from '../user';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private userId: number | null = null;
 
   isLoggedin() {
     if (localStorage.getItem('currentUser')) {
@@ -35,5 +36,13 @@ export class AuthService {
 
   getCurrentuser() {
     return localStorage.getItem('currentUser');
+  }
+  setUserId(userId: number) {
+    this.userId = userId;
+  }
+
+  // Thêm phương thức để truy cập userId
+  getUserId() {
+    return this.userId;
   }
 }
