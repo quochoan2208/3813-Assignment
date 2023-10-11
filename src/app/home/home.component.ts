@@ -13,6 +13,9 @@ import { Router } from '@angular/router';
 })
 export class HomeComponent {
  private router = inject(Router)
-
+  authService: any;
+ logout(event:any){
+  this.authService.logout(event);
+  }
 
 }

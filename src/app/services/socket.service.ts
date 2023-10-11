@@ -149,6 +149,34 @@ export class SocketService {
   addUserToChannel(channelName: string, roomId: string, userId: number) {
     this.socket.emit('addUserToChannel', { channelName, roomId, userId });
   }
+  // getUsersInRoom(roomId: string): Promise<any> {
+  //   return new Promise((resolve, reject) => {
+  //     this.socket.emit('getUsersInRoom', roomId);
+  
+  //     this.socket.on('usersInRoom', (users: any) => {
+  //       resolve(users);
+  //     });
+  
+  //     this.socket.on('usersInRoomError', (error: string) => {
+  //       reject(error);
+  //     });
+  //   });
+  // }
+  
+getUsersInRoom(roomId: string): Observable<any> {
+  return new Observable((observer) => {
+    this.socket.emit('getUsersInRoom', roomId);
+
+    this.socket.on('usersInRoom', (users: any) => {
+      observer.next(users);
+      observer.complete();
+    });
+
+    this.socket.on('usersInRoomError', (error: string) => {
+      observer.error(error);
+    });
+  });
+}
   
   
 

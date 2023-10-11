@@ -28,6 +28,11 @@ export class ProfileComponent implements OnInit{
   roomSelected: boolean = false;
   roomSelections: { [roomId: string]: boolean } = {};
   showCreateUserForm: boolean = false;
+  usersInSelectedRoom: any[] = [];
+  currentUsers: any[] = [];
+  currentRoomUsers: string[] = [];
+  hidelist: boolean = false;
+
 
 
 
@@ -136,10 +141,7 @@ toggleRoomSelection(roomId: string) {
     
   }
 
-  channelExists(roomId: string, channelName: string): boolean {
-    const selectedRoom = this.channelList.find(room => room.roomId === roomId);
-    return selectedRoom ? selectedRoom.channels.includes(channelName) : false;
-  }
+ 
   
   deleteSelectedRoom() {
     if (this.selectedRoomId) {
@@ -170,6 +172,7 @@ toggleRoomSelection(roomId: string) {
   }
 
   leaveRoom(roomId: string) {
+    this.hidelist = true;
     this.socketService.leaveRoom(roomId, this.currentuser.id);
 
     this.socketService.roomLeft().subscribe((response: any) => {
@@ -178,6 +181,8 @@ toggleRoomSelection(roomId: string) {
       } else {
         console.error(`Failed to leave room: ${response.error}`);
       }
+      this.currentUsers = [];
+      
     });
 
     // Cập nhật danh sách phòng sau khi rời phòng (nếu cần)
@@ -187,15 +192,75 @@ toggleRoomSelection(roomId: string) {
   }
 
 
+  // joinRoom(roomId: string) {
+  //   if (roomId) {
+      
+  //       this.socketService.joinRoom(roomId, this.currentuser.id);
+       
+  //   } else {
+  //     console.error('Room ID is invalid.');
+  //   }
+  // }
+  // joinRoom(roomId: string) {
+  //   if (roomId) {
+  //     this.socketService.joinRoom(roomId, this.currentuser.id);
+  
+  //     // Lấy danh sách người dùng từ dữ liệu của bạn
+  //     const room = this.rooms.find((room) => room.id === roomId);
+  //     const userIds = room ? room.users : [];
+  
+  //     // Tìm tên người dùng dựa trên ID
+  //     const userNames = userIds.map((userId: number) => {
+  //       const user = this.users.find((user) => user.id === userId);
+  //       return user ? user.name : 'Unknown User';
+  //     });
+  
+  //     // Lưu danh sách tên người dùng trong một biến của ứng dụng hoặc mảng trạng thái.
+  //     this.usersInSelectedRoom = userNames;
+  //   } else {
+  //     console.error('Room ID is invalid.');
+  //   }
+  // }
+  // joinRoom(roomId: string) {
+  //   if (roomId) {
+  //     this.socketService.joinRoom(roomId, this.currentuser.id);
+  
+  //     // Lấy danh sách người dùng từ dữ liệu của bạn
+  //     const room = this.rooms.find((room) => room.id === roomId);
+  //     const userIds = room ? room.users : [];
+  
+  //     // Tìm tên người dùng dựa trên ID
+  //     const userNames = userIds.map((userId: number) => {
+  //       const user = this.users.find((user) => user.id === userId);
+  //       return user ? user.username : 'Unknown User';
+  //     });
+  
+  //     // Lưu danh sách tên người dùng trong một biến của ứng dụng hoặc mảng trạng thái.
+  //     this.usersInSelectedRoom = userNames;
+  //   } else {
+  //     console.error('Room ID is invalid.');
+  //   }
+  // }
   joinRoom(roomId: string) {
     if (roomId) {
-      
-        this.socketService.joinRoom(roomId, this.currentuser.id);
-       
+      this.hidelist = false;
+      this.socketService.joinRoom(roomId, this.currentuser.id);
+
+      const room = this.rooms.find((room) => room.id === roomId);
+      const userIds = room ? room.users : [];
+
+      // Lưu danh sách tên người dùng trong biến currentUsers
+      this.currentUsers = userIds.map((userId: number) => {
+        const user = this.users.find((user) => user.id === userId);
+        return user ? user : null;
+        
+      });
     } else {
       console.error('Room ID is invalid.');
     }
   }
+  
+  
 
 
   // Trong Angular component
@@ -212,10 +277,7 @@ toggleRoomSelection(roomId: string) {
       this.roomToDelete = ''; 
     }
   }
-  createChannel(roomId: string) {
-  
-    this.socketService.createChannel(this.newChannelName, roomId);
-  }
+ 
   deleteUser(userId: number) {
     const userIndex = this.users.findIndex((user) => user.id === userId);
     if (userIndex !== -1) {
@@ -229,11 +291,18 @@ toggleRoomSelection(roomId: string) {
       console.error('User not found.');
     }
   }
-
+  createChannel(roomId: string) {
+  
+    this.socketService.createChannel(this.newChannelName, roomId);
+  }
   createChannelInRoom() {
     if (this.selectedRoomId && this.newChannelName) {
       this.socketService.createChannelInRoom(this.newChannelName, this.selectedRoomId);
     }
+  }
+  channelExists(roomId: string, channelName: string): boolean {
+    const selectedRoom = this.channelList.find(room => room.roomId === roomId);
+    return selectedRoom ? selectedRoom.channels.includes(channelName) : false;
   }
 
 
@@ -291,6 +360,7 @@ toggleRoomSelection(roomId: string) {
 
 
   ngOnInit(){
+    this.hidelist = true;
     this.currentuser = JSON.parse(this.authService.getCurrentuser() || '{}');
     console.log(this.currentuser);
     this.socketService.reqroomList();

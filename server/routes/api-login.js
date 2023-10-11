@@ -68,7 +68,8 @@ module.exports = function (app, path, fs) {
                     valid: true,
                     email: user.email,
                     username: user.username,
-                    role: user.role
+                    role: user.role,
+                    id: user.id,
                 };
                 res.send(customer);
             } else {
@@ -77,7 +78,8 @@ module.exports = function (app, path, fs) {
                     valid: false,
                     email: '',
                     username: '',
-                    role: ''
+                    role: '',
+                    id: 0,
                 };
                 res.send(customer);
             }

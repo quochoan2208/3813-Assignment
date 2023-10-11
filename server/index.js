@@ -16,7 +16,9 @@ const io = require('socket.io')(http,{
     methods: ["GET","POST"]
   }
 })
-const datauser = require('./datauser.js')
+const datauser = require('./datauser.js');
+const roomdata = require('./roomdata.js');
+
 
 const sockets = require('./routes/socket.js');
 sockets.connect(io, PORT);
@@ -39,6 +41,18 @@ async function findUser(){
    
 }
 }
+
+async function findRoom(){ 
+  try {
+    const Rooms = await roomdata.find();
+    // res.send(Users);
+    console.log(Rooms)
+} catch (err) {
+    console.error(err);
+   
+}
+}
+findRoom();
 
 app.use('/images',express.static('userimages'));
 

@@ -7,7 +7,7 @@ export class User {
     avatar?:string;
     role: string;
     id: number;
-    constructor(username:string='',email:string='',pwd:string='',valid=false,avatar:string="",role:string="",id:number = 0){
+    constructor(username:string='',email:string='',pwd:string='',valid=false,avatar:string="",role:string="",id:number = 0 ){
        
         this.username = username;
         this.email = email;

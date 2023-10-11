@@ -31,7 +31,9 @@ export class LoginComponent implements OnInit {
       this.loggedin = false;
     }
   }
-
+  logout(event:any){
+    this.authService.logout(event);
+    }
   signin(event: any) {
     console.log('at signin');
     event.preventDefault();
