@@ -646,6 +646,286 @@ Error Handling: RESTAPI also provides mechanism for error handling. In case an e
 In a nutshell, the RESTAPI in this project is responsible for managing and accessing data from the database, providing services such as login, registration, user and room management, and is the interface between the machine side Angular client and server. HTTP requests are used to perform these operations through the defined API endpoints 
 
  
+# Phase 2 :
+
+**Documentation - Data Structures**
+
+The data structure of the project\'s core objects remains very similar
+to their design for Phase 1. However, changes are made along the way to
+accommodate the natural progression of the design process. Sections of
+the phase 1 design document have been adapted to the new standard
+formats.
+
+Some data structures play an essential role and have been greatly
+improved. That is:
+
+**User data is stored in a MongoDB file.**
+
+Each user contains the following information:
+
+username: Username.
+
+email: Email address.
+
+pwd: User password.
+
+valid: Authentication status (true/false).
+
+avatar: Avatar (string).
+
+role: User role (one or more).
+
+id: User ID (integer).
+
+Function:
+
+authPage(req, res, next):
+
+Goal: Authenticate user with email and password.
+
+Workflow:
+
+Check if the request body contains email and password.
+
+Compare the email and password in the request with the user data from
+the JSON file.
+
+If authentication is successful, add user information to req.user and
+move on to the next middleware using next().
+
+If authentication fails, return an HTTP error and corresponding message.
+
+authRole(roles):
+
+Workflow:
+
+Check if user information has been added to req.user by the authPage
+middleware.
+
+Check the user\'s roles against the roles passed in as an array.
+
+If the user does not have the required role, return an HTTP error and
+corresponding message.
+
+To use this middleware, import and apply it to a Node.js application,
+such as an Express application. The authPage middleware performs user
+authentication, and the authRole middleware checks its role in accessing
+specific resources.
+
+Demonstrates how to build a system that authenticates users and verifies
+their roles in a Node.js application using user data stored in a MongoDB
+file. The authPage and authRole middleware help implement these
+functions in the application.\
+\
+**Objective:** **Model the data structure for rooms in MongoDB**
+
+Room data structure:
+
+id: Room code (integer).
+
+name: Room name (string).
+
+channels: List of channels in the room (array of strings). This allows
+the room to have different channels to chat about different topics.
+
+users: List of users in the room (array of integers). Each integer can
+represent a user ID.
+
+messages: List of messages in the room (array of message objects).
+
+Each message object includes the following information:
+
+userId: ID of the user who created the message (integer).
+
+username: The name of the user who created the message (string).
+
+text: Message content (string).
+
+Function:
+
+This data structure allows for storing information about chat rooms,
+including names, channels, lists of users, and messages in the room. A
+room can contain multiple channels and user messages.
+
+After defining this data structure, it can be used in applications to
+store information about chat rooms, user management, and messages in the
+room.
+
+This data structure helps manage chat rooms in the application. It
+stores information about room names, channels, users and messages in
+each room, allowing it to build a multi-channel chat system and manage
+user messages.
+
+REST API
+
+1.  Upload.js:\
+    \
+    **Goal:** Build a REST API endpoint to manage image file uploads and
+    management.
+
+> REST API structure:
+>
+> Route: POST /api/upload
+>
+> Description: This endpoint is used to upload image files to the
+> server.
+>
+> HTTP method: POST
+>
+> Ingredient:
+>
+> req: This is the HTTP request sent to the server.
+>
+> res: This is the HTTP response returned to the client.
+>
+> Work:
+>
+> Use the formidable module to handle file uploads.
+>
+> Defines an uploadFolder folder to store uploaded image files.
+>
+> Defines settings for the form object, including uploadDir (storage
+> directory) and keepExtensions (keep file extensions).
+>
+> Use form.parse to process the uploaded data and call a callback
+> function.
+>
+> In the callback function:
+>
+> Check if any errors occurred during file upload and handle them if
+> any.
+>
+> Check if the image file is found in files and files.image is defined.
+>
+> If the image file exists, move it from the temporary folder to the
+> upload folder and rename it according to the original name.
+>
+> Returns a success response if everything went well.
+>
+> Function:
+>
+> This REST API allows users to upload an image file to the server.
+>
+> It checks and handles errors related to file uploads and processing.
+>
+> After a successful upload, it returns information about the image file
+> including file name and size.
+>
+> Use:
+>
+> The POST /api/upload endpoint can be called from the client, providing
+> an image file to upload. Then, receive a response with the uploaded
+> image file information.
+>
+> This REST API is simple but essential, allowing the management of
+> image file uploads and management on the server. It can be integrated
+> into web or mobile applications to allow users to upload and use
+> images.
+
+REST API : api-login.js
+
+**Purpose**
+
+> This REST API is designed to handle user authentication requests via
+> an HTTP POST request to /api/auth. It interacts with the MongoDB
+> database to find user information.
+
+**Project structure**
+
+> Use mongoose library to connect and interact with MongoDB database.
+>
+> Import the User model from the datauser file to manipulate user data.
+>
+> Feature
+>
+> Specify the POST /api/auth route to handle the login request.
+>
+> Check if the request contains data or not. Otherwise, return status
+> code 400 (Bad Request).
+>
+> Search for users in the database based on email and password
+> information from the POST request.
+>
+> Generate responses based on search results:
+>
+> If the user is found, send the user information to the client with
+> status code 200 (OK).
+>
+> If the user is not found, send a failure notification to the client
+> with status code 200 (OK).
+>
+> Handle errors safely by logging and returning status code 500
+> (Internal Server Error) if an error occurs.
+
+**Advantage**
+
+> Use mongoose technology to connect and interact with MongoDB database.
+>
+> Handle errors safely by logging errors and returning status code 500
+> if an error occurs.
+
+**Summary**
+
+> This REST API provides a simple and effective user authentication
+> mechanism through interaction with the MongoDB database.
+
+REST API: socket.js
+
+> **1. Read and Write Data from MongoDB File:**
+>
+> This code uses to read and write data to and from Mongodb files. User
+> and chat room data are stored in the userdata and roomdata files.
+>
+> **2. Socket.IO Connection:**
+>
+> This code uses the Socket.IO library to create and manage real-time
+> client connections via io.on(\'connection\').
+>
+> **3. Working with Chat Rooms:**
+>
+> Functions for chat rooms are defined, including creating a room,
+> joining a room, leaving a room, adding users to the room, adding
+> channels to the room, and sending messages. To manage these
+> operations, the code uses events such as createRoom, joinRoom,
+> leaveRoom, addUserToRoom, addChannelToRoom, and messageforroom.
+>
+> **4. User Operations:**
+>
+> User-related functions include adding new users, deleting users, and
+> updating avatars. Events such as addUser, deleteUser, and updateAvatar
+> are used to perform these tasks.
+>
+> 5\. Broadcast Private Messages:
+>
+> This code powers private chat by allowing users to open and send
+> private messages. The open-private-chat and send-private-message
+> events are used for this feature.
+>
+> **6. Sending Error Messages:**
+>
+> If an error occurs, the code will emit error messages to the client
+> through events such as roomCreationError, joinRoomError,
+> userCreationError, and similar events to notify of errors and
+> problems.
+>
+> **7. Send Data Back to Client:**
+>
+> Events such as socket.emit and io.emit are used to send data and
+> messages from the server to the client, including room lists, user
+> lists, and error messages.
+>
+> **8. Disconnection Handling:**
+>
+> This code also handles the event when the user disconnects. In this
+> case, the user will be removed from all rooms in which they
+> participated.
+>
+> **9. Advantages:**
+>
+> This REST API supports many of the basic features of a real-time chat
+> room application, including creating rooms, joining rooms, sending
+> messages, managing users and rooms, and private chat features. Error
+> messages are also handled well.
 
   
 
