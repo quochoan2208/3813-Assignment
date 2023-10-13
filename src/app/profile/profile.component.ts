@@ -5,6 +5,7 @@ import { AuthService } from '../services/auth.service';
 import {User} from '../user';
 import { SocketService } from '../services/socket.service';
 import { Observable } from 'rxjs';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 
 @Component({
@@ -15,10 +16,21 @@ import { Observable } from 'rxjs';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit{
+  selectedFile: File | null = null;
+  imageUrl: string | null = null;
+  safeImageUrl: SafeUrl | null = null;
+  privateMessage: any[] = []; 
   newRoomName: string = '';
-  message: string ="";
+  message: string = '';
+  messages: any[] = [];
   newuserid : number | null = null;
-  receivedMessages: string[] = [];
+  messagesforroom: any[] = [];
+  messsageidroom: string = '' ;
+  Openboxchatprivate: boolean = false;
+  rcid: number |null = null;
+  
+  
+  
   roomToDelete: string = '';
   newChannelName: string = '';
   roomsWithChannels: any[] = [];
@@ -32,16 +44,10 @@ export class ProfileComponent implements OnInit{
   currentUsers: any[] = [];
   currentRoomUsers: string[] = [];
   hidelist: boolean = false;
-
-
-
-
-
   rooms : any[] =  [
-    // { id: 1, name: 'Room 1', channels: [], users: [] },
-    // { id: 2, name: 'Room 2', channels: [], users: [] },
-    // { id: 3, name: 'Room 3', channels: [], users: [] },
+
   ];
+  messageText: string = '';
   selectedRoomChannels: any;
   newUsername: string = "";
   newEmail: string ="";
@@ -63,11 +69,52 @@ export class ProfileComponent implements OnInit{
   selectedfile:any = null;
   imagepath:String ="";
   currentuser:User = new User();
+  roomMessages: { [roomId: string]: any[] } = {};
 
-  constructor(private socketService: SocketService,private auth: AuthService){}
-  sendMessage() {
-    this.socketService.sendMessage(this.message);
+  constructor(private socketService: SocketService,private auth: AuthService,private sanitizer: DomSanitizer){
+    this.socketService.onPrivateMessage().subscribe((message: any) => {
+      console.log(message);
+      this.privateMessage.push(message);
+      console.log(this.privateMessage);
+  });
+ 
+
+    this.socketService.on('messageforroom').subscribe((message: any) => {
+      console.log(message);
+      const roomId = this.messsageidroom;
+      if (!this.roomMessages[roomId]) {
+        this.roomMessages[roomId] = [];
+      }
+      this.roomMessages[roomId].push(message);
+    console.log(this.roomMessages[roomId]);
+    });
+    this.socketService.on('message').subscribe((message: string) => {
+      
+      this.messages.push(message);
+      console.log(message);
+    });
+
+    
+
   }
+  onFileSelected(event: any) {
+    this.selectedFile = event.target.files[0];
+  }
+
+  displayImage() {
+    if (this.selectedFile) {
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        this.safeImageUrl = this.sanitizer.bypassSecurityTrustUrl(e.target.result);
+      };
+
+      reader.readAsDataURL(this.selectedFile);
+    }
+  }
+  // sendMessage() {
+  //   this.socketService.sendMessage(this.message);
+  // }
   updateSelectedRoom(userId: number, roomId: any) {
    
     this.selectedRoomId = roomId;
@@ -241,14 +288,28 @@ toggleRoomSelection(roomId: string) {
   //     console.error('Room ID is invalid.');
   //   }
   // }
-  joinRoom(roomId: string) {
+  joinRoom(roomId: any) {
     if (roomId) {
       this.hidelist = false;
       this.socketService.joinRoom(roomId, this.currentuser.id);
+      console.log(roomId);
+      this.messsageidroom = roomId;
+      console.log(roomId);
+      const roomToTalk = this.rooms.find((room) => room.id === roomId);
+      if (roomToTalk) {
+          this.roomMessages[roomId] = roomToTalk.messages;
+      } else {
+          console.log('Invalid roomId');
+      }
+      
+        
+      
+      
+     
 
       const room = this.rooms.find((room) => room.id === roomId);
       const userIds = room ? room.users : [];
-
+      
       // Lưu danh sách tên người dùng trong biến currentUsers
       this.currentUsers = userIds.map((userId: number) => {
         const user = this.users.find((user) => user.id === userId);
@@ -336,6 +397,20 @@ toggleRoomSelection(roomId: string) {
       
     }
   }
+  openboxchatprivate() {
+    this.Openboxchatprivate = true;
+    console.log("call private");
+
+  }
+  // sendPrivateMessage(receiverId: number, message: string) {
+  //   console.log(receiverId)
+  //   console.log("called")
+  //   if (this.messageText) {
+  //     this.socketService.sendPrivateMessage(receiverId, this.messageText);
+  //     this.messageText = ''; // Xóa nội dung tin nhắn sau khi gửi
+  //   }
+  // }
+  
   addUserToRoom(userId: any, roomId: number) {
     this.actionsCompleted= true;
     this.socketService.addUserToRoom(userId, roomId);
@@ -360,11 +435,19 @@ toggleRoomSelection(roomId: string) {
 
 
   ngOnInit(){
+  
+
+
+    
+   
     this.hidelist = true;
     this.currentuser = JSON.parse(this.authService.getCurrentuser() || '{}');
     console.log(this.currentuser);
     this.socketService.reqroomList();
-    this.socketService.getroomList((msg:string)=>{ this.rooms = JSON.parse(msg)});
+    this.socketService.getroomList((msg:string)=>{ this.rooms = JSON.parse(msg)
+      // console.log(this.rooms[6].messages)
+    });
+    
     this.socketService.userDeleted().subscribe((deletedUserId: number) => {
       console.log(`User with ID ${deletedUserId} has been deleted.`);
       
@@ -392,6 +475,42 @@ toggleRoomSelection(roomId: string) {
     
     
   }
+  sendMessage() {
+    if (this.message) {
+      // Replace 'your_user_id' with the actual user ID
+      this.socketService.sendMessage(this.currentuser.id, this.currentuser.username,this.message);
+      this.message = ''; // Clear message input after sending
+    }
+  }
+  sendMessageForRoom(roomId: number): void {
+    console.log('sendMessageForRoom() called');
+
+    if (this.message && roomId ) {
+      this.socketService.sendMessageToRoom(roomId, this.currentuser.id, this.currentuser.username, this.message);
+      console.log(this.message);
+      console.log("Id:" + roomId);
+      this.message = ''; // Xóa nội dung tin nhắn sau khi gửi
+    } 
+  }
+
+//   openPrivateChat(userId: number) {
+//     this.socketService.openPrivateChat(userId);
+// }
+openPrivateChat(userId:number) {
+
+  this.socketService.openPrivateChat(userId);
+
+
+  // console.log("called:" + userId);
+  // this.rcid = userId;
+}
+
+sendPrivateMessage( receiverId: number, message: any) {
+  console.log("sent:" + receiverId + message)
+    this.socketService.sendPrivateMessage(this.currentuser.username,receiverId, message);
+    
+}
+
 
 
    

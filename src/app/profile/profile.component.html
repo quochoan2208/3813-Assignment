@@ -86,11 +86,87 @@
          
     </div>
     <div class="box-chat">
-      <div class="message-text"></div>
+      <!-- <div class="message-text">
+        <div *ngFor="let msg of messages">
+          <h4>{{ msg.username }}</h4>
+          <p>{{ msg.text }}</p>
+        </div>
+      </div>
       <div class="input-text">
-        <input type="text">
-        <button>Send</button>
-      </div> </div>
+        <div>
+          <input [(ngModel)]="message" (keyup.enter)="sendMessage()" placeholder="Type a message..." />
+          <button (click)="sendMessage()">Send</button>
+        </div>
+      </div> -->
+      <!-- <div *ngIf="!hidelist">
+        <div *ngFor="let room of rooms">
+            <div *ngIf="room.id === messsageidroom">
+              <h2>Room: {{ room.name }}</h2>
+              <p>{{room.id}}</p>
+              <div *ngFor="let message of roomMessages[room.id]">
+                <p>{{ message.username }}: {{ message.text }}</p>
+              </div>
+              <div *ngIf="!hidelist"  >
+                <input [(ngModel)]="message" placeholder="Type a message..." (keyup.enter)="sendMessageForRoom(room.id)" />
+                <button (click)="sendMessageForRoom(room.id)">Send</button>
+                
+              </div>
+            </div>
+            
+          
+          </div>
+         
+        
+      </div> -->
+      <!-- <ul>
+        <li *ngFor="let user of users">
+          <span (click)="openboxchatprivate()">{{ user.username }}</span>
+          <div ngIf="Openboxchatprivate">
+            <div class="input-text">
+              <div>
+                <input [(ngModel)]="message" (keyup.enter)=" sendPrivateMessage(user.id)" placeholder="Type a message..." />
+                <button (click)="sendMessage()">Send</button>
+              </div>
+            </div> 
+
+          </div>
+          
+        
+        </li>
+      </ul> -->
+
+      <!-- Giao diện để mở hộp chat riêng tư -->
+
+      <li *ngFor="let user of users"  >
+        <span (click)="openPrivateChat(user.id)">{{ user.username }}</span>
+        <!-- <button (click)="openPrivateChat(selectedUser.id)">Start Private Chat</button> -->
+
+       
+            <div *ngFor="let message of privateMessage">
+                {{ message.sendername + " " + message.message  }}
+            </div>
+            <input [(ngModel)]="message" (keyup.enter)="sendPrivateMessage(user.id, message)" placeholder="Type a private message..." />
+            <button (click)="sendPrivateMessage(user.id, message)">Send</button>
+        </li>
+        <input type="file" (change)="onFileSelected($event)" accept="image/*">
+        <button (click)="displayImage()">Display Image</button>
+        <img [src]="safeImageUrl" *ngIf="safeImageUrl">
+        <!-- <button (click)="openPrivateChat()">Start Private Chat</button>
+        <button (click)="sendPrivateMessage()">Send</button> -->
+        
+
+
+
+
+      
+      
+      <!-- Thêm phần để gửi tin nhắn -->
+      
+      
+      
+    </div>
+
+    
     
 <div class="user-list">
 

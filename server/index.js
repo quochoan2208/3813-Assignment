@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 
 
 
+
 const cors = require('cors'); 
 const path = require('path');
 const {authPage, authRole} = require ('./middleware/basicAuth.js');
@@ -41,6 +42,7 @@ async function findUser(){
    
 }
 }
+
 
 async function findRoom(){ 
   try {
@@ -79,6 +81,7 @@ app.get('/SUP',authPage,authRole("SUP"),(req,res,next)=>{
 })
 
 require('./routes/api-login.js')(app,path,fs);
+require('./routes/uploads.js')(app,formidable,fs,path);
 
 
 require('./listen.js')(http,PORT);

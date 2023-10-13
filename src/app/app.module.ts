@@ -9,6 +9,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { ProfileComponent } from './profile/profile.component';
 import { HttpClientModule } from '@angular/common/http';
 import { HomeComponent } from './home/home.component';
+import { UploadimageComponent } from './uploadimage/uploadimage.component';
 
 
 const routes: Routes = [{path: 'login',component: LoginComponent},{path: 'account',component: AccountComponent},{path: 'profile',component: ProfileComponent}, {path: 'home',component: HomeComponent}, ]
@@ -17,6 +18,7 @@ const routes: Routes = [{path: 'login',component: LoginComponent},{path: 'accoun
     declarations: [
         AppComponent,
         AccountComponent,
+        UploadimageComponent,
     ],
     providers: [],
     bootstrap: [AppComponent],

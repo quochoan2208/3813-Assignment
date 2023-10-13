@@ -17,5 +17,7 @@ const ObjectId = Schema.ObjectId;
     name: String,
     channels: [String],
     users: [Number],
+    messages: [{ userId: Number, username: String, text: String }]
+
   });
 module.exports = mongoose.model('rooms',roomSchema); 
