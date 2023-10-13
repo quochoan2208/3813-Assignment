@@ -2,13 +2,13 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 const PORT = 3000;
+const multer = require('multer');
+
 const mongoose = require('mongoose');
-
-
-
-
 const cors = require('cors'); 
 const path = require('path');
+const storage = multer.memoryStorage(); // Lưu trữ tệp ảnh trong bộ nhớ
+const upload = multer({ storage: storage });
 const {authPage, authRole} = require ('./middleware/basicAuth.js');
 const userData = require('./data/users.json').people; 
 const io = require('socket.io')(http,{
@@ -82,6 +82,43 @@ app.get('/SUP',authPage,authRole("SUP"),(req,res,next)=>{
 
 require('./routes/api-login.js')(app,path,fs);
 require('./routes/uploads.js')(app,formidable,fs,path);
+// app.post('/upload-avatar', upload.single('avatar'), (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).send('No file uploaded.');
+//     }
+
+//     // Xác định thông tin đăng nhập hoặc xác thực, ví dụ: email
+//     const userEmail = req.body.email; // Thay đổi cách bạn xác định thông tin đăng nhập
+
+//     // Tìm người dùng trong MongoDB dựa trên email
+//     datauser.findOne({ email: userEmail }, (err, user) => {
+//       if (err) {
+//         return res.status(500).send('Error finding user.');
+//       }
+
+//       if (!user) {
+//         return res.status(404).send('User not found.');
+//       }
+
+//       // Cập nhật trường "avatar" của người dùng với dữ liệu tệp ảnh
+//       user.avatar = req.file.buffer;
+
+//       // Lưu thông tin người dùng đã cập nhật
+//       user.save((err) => {
+//         if (err) {
+//           return res.status(500).send('Error updating user avatar.');
+//         }
+
+//         return res.status(200).send('Avatar uploaded and user updated.');
+//       });
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('Error uploading avatar.');
+//   }
+// });
+
 
 
 require('./listen.js')(http,PORT);

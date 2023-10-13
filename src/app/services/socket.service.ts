@@ -3,6 +3,7 @@
   import {io} from 'socket.io-client';
   const SERVER_URL = 'http://localhost:3000';
   import { User } from '../user';
+  import { HttpClient } from '@angular/common/http';
 
   @Injectable({
     providedIn: 'root'
@@ -18,7 +19,8 @@
     roomMessages: { [roomId: string]: any[] } = {};
     private selectedUserId: number | null | undefined;
     private selectedUserIdSubject: BehaviorSubject<number | null> = new BehaviorSubject<number | null>(null);
-    constructor() {
+    constructor(private http: HttpClient) {
+      
       // this.selectedUserId = null;
       
       this.socket = io(SERVER_URL);
@@ -156,6 +158,18 @@ onPrivateMessage(): Observable<string> {
     });
   });
 }
+public updateAvatar(userId: number, safeImageUrl: any) {
+  this.socket.emit('updateAvatar', { userId, safeImageUrl });
+}
+
+
+// public uploadAvatar(userId: string, file: File) {
+//   const formData = new FormData();
+//   formData.append('avatar', file);
+//   formData.append('userId', userId);
+
+//   return this.http.post('/upload-avatar', formData);
+// }
 
 // Nghe sự kiện tin nhắn riêng tư
 // onPrivateMessage(): Observable<string> {
@@ -245,6 +259,7 @@ onPrivateMessage(): Observable<string> {
       });
     });
   }
+  
     
     
 

@@ -181,33 +181,6 @@ module.exports = {
               });
               
 
-              
-              // socket.on('addChannelToRoom', (data) => {
-              //   const { channelName, roomId } = data;
-              
-              //   const room = rooms.find((room) => room.id === roomId);
-              //   if (room) {
-              //     const newChannel = {
-              //       name: channelName,
-              //     };
-              
-              //     room.channels.push(newChannel);
-              
-              //     io.to(roomId).emit('channelCreated', newChannel);
-              //     sendUpdatedRoomList();
-              
-              //     // Cập nhật thông tin phòng trong mảng `rooms`
-              //     const roomIndex = rooms.findIndex((r) => r.id === roomId);
-              //     if (roomIndex !== -1) {
-              //       rooms[roomIndex] = room;
-              
-              //       // Ghi dữ liệu phòng vào tệp JSON
-              //       fs.writeFileSync(roomsDataFilePath, JSON.stringify(rooms), 'utf8');
-              //     }
-              //   } else {
-              //     socket.emit('channelCreationError', 'Room does not exist.');
-              //   }
-              // });
               socket.on('addChannelToRoom', async (data) => {
                 const { channelName, roomId } = data;
               
@@ -370,49 +343,10 @@ socket.on('getUsersInRoom', async (roomId) => {
 
 
           
-// socket.on('message', ({ roomId, userId, text }) => {
-//   if (rooms[roomId]) {
-//     const message = { userId, text };
-//     rooms[roomId].messages.push(message);
 
-//     // Gửi tin nhắn đến tất cả người dùng trong phòng
-//     io.to(roomId).emit('message', message);
-//   }
-// });
 const roomMessages = {};
 
-// socket.on('messageforroom', ({ roomId, userId, username, text }) => {
-//   try {
-//     // Tìm phòng trong MongoDB dựa trên `roomId`
-//     Room.findOne({ id: roomId }, (err, room) => {
-//       if (err) {
-//         console.error('Error sending message:', err);
-//       } else if (room) {
-//         const message = { userId, username, text };
-//         room.messages.push(message);
-//         console.log(message);
-//         // Lưu tin nhắn vào MongoDB (tùy bạn)
-//         room.save((saveErr, savedRoom) => {
-//           if (saveErr) {
-//             console.error('Error saving message:', saveErr);
-//           } else {
-//             // Gửi tin nhắn đến tất cả người dùng trong phòng
-//             io.to(roomId).emit('messageforroom', message);
-//             console.log(message);
-//           }
-//         });
 
-//         // Lưu tin nhắn trong biến `roomMessages`
-//         if (!roomMessages[roomId]) {
-//           roomMessages[roomId] = [];
-//         }
-//         roomMessages[roomId].push(message);
-//       }
-//     });
-//   } catch (error) {
-//     console.error('Error sending message:', error);
-//   }
-// });
 socket.on('messageforroom', async ({ roomId, userId, username, text }) => {
   try {
     // Tìm phòng trong MongoDB dựa trên `roomId`
@@ -464,52 +398,6 @@ socket.on('message', ({ userId, username,text }) => {
 
 
 
-
-            // socket.on('messageforroom', ({ roomId, userId, username, text }) => {
-            //   try {
-            //     // Tìm phòng trong MongoDB dựa trên `roomId`
-            //     const room = Room.findOne({ id: roomId });
-            
-            //     if (room) {
-            //       const message = { userId, username, text };
-            //       room.messages.push(message);
-            
-            //       // Lưu tin nhắn vào MongoDB (tùy bạn)
-            //       room.save();
-            
-            //       // Gửi tin nhắn đến tất cả người dùng trong phòng
-            //       io.to(roomId).emit('messageforroom', message);
-            //     }
-            //   } catch (error) {
-            //     console.error('Error sending message:', error);
-            //   }
-            // });
-            // socket.on('messageforroom', ({ roomId, userId, username, text }) => {
-            //   try {
-            //     // Tìm phòng trong MongoDB dựa trên `roomId`
-            //     Room.findOne({ id: roomId }, (err, room) => {
-            //       if (err) {
-            //         console.error('Error sending message:', err);
-            //       } else if (room) {
-            //         const message = { userId, username, text };
-            //         room.messages.push(message);
-            //         // Lưu tin nhắn vào MongoDB (tùy bạn)
-            //         room.save((saveErr, savedRoom) => {
-            //           if (saveErr) {
-            //             console.error('Error saving message:', saveErr);
-            //           } else {
-            //             // Gửi tin nhắn đến tất cả người dùng trong phòng
-            //             io.to(roomId).emit('messageforroom', message);
-            //           }
-            //         });
-            //       }
-            //     });
-            //   } catch (error) {
-            //     console.error('Error sending message:', error);
-            //   }
-            // });
-            // Tạo một đối tượng để lưu trữ tin nhắn của từng phòng
-
 // Cập nhật lại code cho phần khác tương tự
 const privateChatRooms = {}; // Lưu trữ phòng chat riêng tư
 
@@ -530,6 +418,42 @@ socket.on('open-private-chat', (userId) => {
 //     console.log(message);
 //     io.to(roomName).emit(`private-message-${userId}`, message);
 // });
+// socket.on('updateAvatar', ({userId, safeImageUrl}) => {
+//   // Lưu safeImageUrl vào MongoDB trong người dùng hiện tại (currentUser)
+//   // Tìm thông tin người dùng dựa trên userId hoặc thông tin đăng nhập của bạn
+//   // const userId = 'your_user_id_here'; // Thay đổi cách bạn xác định userId
+//   User.findByIdAndUpdate(userId, { avatar: safeImageUrl }, (err, user) => {
+//     if (err) {
+//       console.error('Error updating user avatar:', err);
+//       // Gửi thông báo lỗi về phía máy khách nếu cần
+//       socket.emit('updateAvatarError', 'Error updating user avatar.');
+//     } else if (!user) {
+//       // Gửi thông báo lỗi về phía máy khách nếu không tìm thấy người dùng
+//       socket.emit('updateAvatarError', 'User not found.');
+//     } else {
+//       // Gửi thông báo thành công về phía máy khách nếu cập nhật thành công
+//       socket.emit('updateAvatarSuccess', 'Avatar uploaded and user updated.');
+//     }
+//   });
+// });
+socket.on('updateAvatar', ({ userId, safeImageUrl }) => {
+  // Tìm thông tin người dùng dựa trên userId
+  // const userId = 'your_user_id_here'; // Thay đổi cách bạn xác định userId
+
+  User.updateOne({ id: userId }, { avatar: safeImageUrl })
+    .then((result) => {
+      if (result.nModified === 0) {
+        socket.emit('updateAvatarError', 'User not found.');
+      } else {
+        socket.emit('updateAvatarSuccess', 'Avatar uploaded and user updated.');
+      }
+    })
+    .catch((err) => {
+      console.error('Error updating user avatar:', err);
+      socket.emit('updateAvatarError', 'Error updating user avatar.');
+    });
+});
+
 socket.on('send-private-message', (data) => {
   const { sendername, receiverId, message } = data;
   const roomName = `private-${receiverId}`;

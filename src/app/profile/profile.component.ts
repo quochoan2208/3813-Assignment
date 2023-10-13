@@ -70,6 +70,7 @@ export class ProfileComponent implements OnInit{
   imagepath:String ="";
   currentuser:User = new User();
   roomMessages: { [roomId: string]: any[] } = {};
+  socket: any;
 
   constructor(private socketService: SocketService,private auth: AuthService,private sanitizer: DomSanitizer){
     this.socketService.onPrivateMessage().subscribe((message: any) => {
@@ -100,6 +101,7 @@ export class ProfileComponent implements OnInit{
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
   }
+  
 
   displayImage() {
     if (this.selectedFile) {
@@ -107,6 +109,8 @@ export class ProfileComponent implements OnInit{
 
       reader.onload = (e: any) => {
         this.safeImageUrl = this.sanitizer.bypassSecurityTrustUrl(e.target.result);
+        // this.socketService.updateAvatar( this.currentuser.id,this.safeImageUrl);
+
       };
 
       reader.readAsDataURL(this.selectedFile);
@@ -239,55 +243,6 @@ toggleRoomSelection(roomId: string) {
   }
 
 
-  // joinRoom(roomId: string) {
-  //   if (roomId) {
-      
-  //       this.socketService.joinRoom(roomId, this.currentuser.id);
-       
-  //   } else {
-  //     console.error('Room ID is invalid.');
-  //   }
-  // }
-  // joinRoom(roomId: string) {
-  //   if (roomId) {
-  //     this.socketService.joinRoom(roomId, this.currentuser.id);
-  
-  //     // Lấy danh sách người dùng từ dữ liệu của bạn
-  //     const room = this.rooms.find((room) => room.id === roomId);
-  //     const userIds = room ? room.users : [];
-  
-  //     // Tìm tên người dùng dựa trên ID
-  //     const userNames = userIds.map((userId: number) => {
-  //       const user = this.users.find((user) => user.id === userId);
-  //       return user ? user.name : 'Unknown User';
-  //     });
-  
-  //     // Lưu danh sách tên người dùng trong một biến của ứng dụng hoặc mảng trạng thái.
-  //     this.usersInSelectedRoom = userNames;
-  //   } else {
-  //     console.error('Room ID is invalid.');
-  //   }
-  // }
-  // joinRoom(roomId: string) {
-  //   if (roomId) {
-  //     this.socketService.joinRoom(roomId, this.currentuser.id);
-  
-  //     // Lấy danh sách người dùng từ dữ liệu của bạn
-  //     const room = this.rooms.find((room) => room.id === roomId);
-  //     const userIds = room ? room.users : [];
-  
-  //     // Tìm tên người dùng dựa trên ID
-  //     const userNames = userIds.map((userId: number) => {
-  //       const user = this.users.find((user) => user.id === userId);
-  //       return user ? user.username : 'Unknown User';
-  //     });
-  
-  //     // Lưu danh sách tên người dùng trong một biến của ứng dụng hoặc mảng trạng thái.
-  //     this.usersInSelectedRoom = userNames;
-  //   } else {
-  //     console.error('Room ID is invalid.');
-  //   }
-  // }
   joinRoom(roomId: any) {
     if (roomId) {
       this.hidelist = false;
@@ -377,7 +332,7 @@ toggleRoomSelection(roomId: string) {
         email: this.newEmail,
         pwd: this.newPassword,
         valid: true, 
-        avatar: '', 
+        avatar: "", 
         role: 'USER',
         id: this.index 
       };
