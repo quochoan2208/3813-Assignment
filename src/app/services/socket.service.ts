@@ -19,42 +19,40 @@
     roomMessages: { [roomId: string]: any[] } = {};
     private selectedUserId: number | null | undefined;
     private selectedUserIdSubject: BehaviorSubject<number | null> = new BehaviorSubject<number | null>(null);
+    roomLeftSubject: any;
     constructor(private http: HttpClient) {
       
-      // this.selectedUserId = null;
-      
-      this.socket = io(SERVER_URL);
-      // this.socket.on('messageforroom', (message: any) => {
-      //   const roomId = message.roomId;
-      //   if (!this.roomMessages[roomId]) {
-      //     this.roomMessages[roomId] = [];
-      //   }
-      //   this.roomMessages[roomId].push(message);
-      // });
 
+      //listen on port localhost:3000
+      this.socket = io(SERVER_URL);
+
+ // Listen for an updated room list from the server
       this.socket.on('updatedRoomList', (data: any) => {
         this.roomsWithChannels = data;
         this.roomListSubject.next(data);
       });
 
     }
+    
+  // Send a request for the room list
     reqroomList(){
       this.socket.emit('roomlist','list please');
     }
-
+ // Get the room list from the server
     getroomList(next:any){
       this.socket.on('roomlist',(res: any)=>next(res));
 
     }
-
+      // Join a room with a specific roomId and userId
     joinRoom(roomId: string, userId: number) {
       this.socket.emit('joinRoom', { roomId, userId });
     }
+      // Create a private chat between senderId and receiverId
     createPrivateChat(senderId: number, receiverId: number) {
       this.socket.emit('privateMessage', { senderId, receiverId });
     }
     
-
+ // Observable for room join success or error
     roomJoined(): Observable<any> {
       return new Observable((observer) => {
         this.socket.on('joinRoomSuccess', (room: any) => {
@@ -66,15 +64,16 @@
         });
       });
     }
+      // Add a user to a room
     addUserToRoom(userId: number, roomId: number) {
     
       this.socket.emit('addUserToRoom', { userId, roomId });
     }
-    
-    leaveRoom(roomId: string, userId: number) {
+     // Leave a room
+    leaveRoom(roomId: any, userId: number) {
       this.socket.emit('leaveRoom', roomId, userId);
     }
-    
+    // Observable for room leave success or error
     roomLeft(): Observable<any> {
       return new Observable((observer) => {
         this.socket.on('leaveRoomSuccess', (room: any) => {
@@ -86,14 +85,16 @@
         });
       });
     }
-
+ // Add a new user
     addUser(newUser: User) {
       this.socket.emit('addUser', newUser); 
     }
+    // Delete a user
     deleteUser(userId: number) {
       
       this.socket.emit('deleteUser', userId);
     }
+    // Observable for user deletion
     userDeleted() {
       
       return new Observable<number>((observer) => {
@@ -102,6 +103,7 @@
         });
       });
     }
+     // Observable for user deletion error
     userDeleteError() {
     
       return new Observable<string>((observer) => {
@@ -112,6 +114,7 @@
 
       
     }
+     // Get a list of users
     getUsersList(): Observable<any[]> {
       return new Observable<any[]>((observer) => {
         this.socket.emit('getUsersList');
@@ -121,30 +124,17 @@
       });
     }
   
-
-    // sendMessage(message: string) {
-    //   this.socket.emit('message', message);
-    // }
-
-    // receiveMessage(callback: (message: string) => void) {
-    //   this.socket.on('message', callback);
-    // }
-
-    // Khi người dùng mở hộp chat riêng tư
-// openPrivateChat(userId: number) {
-//   this.socket.emit('open-private-chat', userId);
-//   this.selectedUserId = userId;
-//   console.log(userId + "" + this.selectedUserId)
-// }
+// Open a private chat with a user
 openPrivateChat(userId: number) {
   this.selectedUserIdSubject.next(userId);
   this.socket.emit('open-private-chat', userId);
 }
 
-// Gửi tin nhắn riêng tư cho một người dùng cụ thể
+// Send message to an individual person
 sendPrivateMessage(sendername: string,receiverId: number, message: string) {
   this.socket.emit('send-private-message', { sendername: sendername,receiverId: receiverId, message });
 }
+// Observable for receiving private messages
 onPrivateMessage(): Observable<string> {
   return new Observable<string>((observer) => {
     console.log("da duoc goi")
@@ -158,37 +148,19 @@ onPrivateMessage(): Observable<string> {
     });
   });
 }
+// Update the avatar for a user
 public updateAvatar(userId: number, safeImageUrl: any) {
   this.socket.emit('updateAvatar', { userId, safeImageUrl });
 }
 
 
-// public uploadAvatar(userId: string, file: File) {
-//   const formData = new FormData();
-//   formData.append('avatar', file);
-//   formData.append('userId', userId);
 
-//   return this.http.post('/upload-avatar', formData);
-// }
-
-// Nghe sự kiện tin nhắn riêng tư
-// onPrivateMessage(): Observable<string> {
-//   return new Observable<string>((observer) => {
-//       this.socket.on(`private-message-${this.selectedUserId}}`, (message: string) => {
-//           observer.next(message);
-//           console.log(this.selectedUserId)
-//       });
-//   });
-// }
-
-    // sendPrivateMessage(receiverId: number, messageText: string) {
-    //   this.socket.emit('privateMessage', { receiverId, message: messageText });
-    // }
-    
-    sendMessage(userId: number,  username: string,text: string,): void {
-      this.socket.emit('message', { userId, username,text });
+  // Send a message
+    sendMessage(userId: number, username: string, text: string, image: any): void {
+      this.socket.emit('message', { userId, username, text, image });
     }
-    // Phương thức để lắng nghe sự kiện từ máy chủ
+    
+    // Listen for server events
     on(event: string): Observable<any> {
       return new Observable<any>((observer) => {
         this.socket.on(event, (data: any) => {
@@ -196,55 +168,51 @@ public updateAvatar(userId: number, safeImageUrl: any) {
         });
       });
     }
+    // Create a room
     createRoom(room: string) {
 
       this.socket.emit('createRoom', room);
     }
+    // Send a message to a room
     sendMessageToRoom(roomId: number, userId: number, username: string, message: string): void {
       this.socket.emit('messageforroom', { roomId, userId, username, text: message });
     }
     
 
-
+ // Get the room list as an observable
     getRoomList(): Observable<any> {
       return this.roomListSubject.asObservable();
     }
+     // Delete a room
     deleteRoom(roomId: string) {
     
       this.socket.emit('deleteRoom', roomId);
 
       this.roomDeletedSubject.next(roomId);
     }
+    // Observable for room deletion
     roomDeleted(): Observable<string> {
       return this.roomDeletedSubject.asObservable();
     }
+     // Create a channel
     createChannel(channelName: string, roomId: string) {
   
       this.socket.emit('createChannel', { channelName, roomId });
     }
+     // Add a channel to a room
     addChannelToRoom(channelName: string, roomId: string) {
       this.socket.emit('addChannelToRoom', { channelName, roomId });
     }
+    // Create a channel in a room
     createChannelInRoom(channelName: string, roomId: string) {
       this.socket.emit('createChannel', { channelName, roomId });
     }
+    // Add a user to a channel
     addUserToChannel(channelName: string, roomId: string, userId: number) {
       this.socket.emit('addUserToChannel', { channelName, roomId, userId });
     }
-    // getUsersInRoom(roomId: string): Promise<any> {
-    //   return new Promise((resolve, reject) => {
-    //     this.socket.emit('getUsersInRoom', roomId);
-    
-    //     this.socket.on('usersInRoom', (users: any) => {
-    //       resolve(users);
-    //     });
-    
-    //     this.socket.on('usersInRoomError', (error: string) => {
-    //       reject(error);
-    //     });
-    //   });
-    // }
-    
+
+     // Get the list of users in a room
   getUsersInRoom(roomId: string): Observable<any> {
     return new Observable((observer) => {
       this.socket.emit('getUsersInRoom', roomId);
@@ -260,8 +228,7 @@ public updateAvatar(userId: number, safeImageUrl: any) {
     });
   }
   
-    
-    
+
 
     
     

@@ -1,4 +1,41 @@
-*{
+/* *{
     margin: 0;
     padding: 0;
+} */
+body {
+    background-color: rgb(57, 0, 110);
+    background-image: url('../app/image/6676346.png');
+  background-repeat: repeat;
+  background-size: 40px;  
+  animation: moveBackground 30s linear infinite; 
+  
 }
+nav {
+    background-color: rgb(50, 0, 97);
+}
+.navbar.bg-tim {
+    background-color: rgb(50, 0, 97); 
+  }
+  @keyframes moveBackground {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 100% 100%;
+    }
+  }
+  .logo{
+    margin-top: 20px;
+    padding: 30px;
+    padding-right: 50px;
+    background-image: url('../app/image/6676346.png');
+    background-size: 50px;
+    background-repeat:no-repeat;
+    width: 50px;
+    height: 50px;
+  }
+    
+    
+  
+  
+  

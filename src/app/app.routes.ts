@@ -9,6 +9,7 @@ export const routes: Routes = [
     {path: 'profile', 
     canActivate:[authGuard],
     loadChildren: () => import('./profile/profile.component').then(mod => mod.ProfileComponent)},
+    {path: '', loadChildren: () => import('./uploadimage/uploadimage.component').then(mod => mod.UploadimageComponent)}
     
     
 ];

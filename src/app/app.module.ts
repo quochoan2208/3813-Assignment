@@ -12,7 +12,7 @@ import { HomeComponent } from './home/home.component';
 import { UploadimageComponent } from './uploadimage/uploadimage.component';
 
 
-const routes: Routes = [{path: 'login',component: LoginComponent},{path: 'account',component: AccountComponent},{path: 'profile',component: ProfileComponent}, {path: 'home',component: HomeComponent}, ]
+const routes: Routes = [{path: '',component: LoginComponent},{path: 'account',component: AccountComponent},{path: 'profile',component: ProfileComponent}, {path: 'home',component: HomeComponent},{path: 'upload',component: UploadimageComponent} ]
 
 @NgModule({
     declarations: [

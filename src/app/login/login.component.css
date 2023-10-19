@@ -4,7 +4,7 @@
     margin-inline:auto;
     margin-top: 10px;
     padding: 30px;
-    background-color: rgb(91, 0, 177);
+    background-color: rgb(78, 0, 151);
     border-radius:10px ;
 
 }
@@ -30,6 +30,39 @@
   a:hover {
     color: #e100ff; /* Màu sắc khi hover */
   }
-  b {
-    color: #36003d;
+  span:hover {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: #e100ff; /* Màu sắc khi hover */
   }
+  /* b {
+    color: #9800ac;
+  } */
+  b {
+    color: #9800ac; /* Màu sắc chữ cho phần tử b */
+    /* font-family: 'Press Start 2P', cursive;  */
+  
+    text-shadow: 1px 1px 4px #ff00ff, -1px -1px 4px #470038; /* Hiệu ứng phát sáng và "3D" */
+  
+    transition: text-shadow 0.3s ease; /* Hiệu ứng chuyển đổi text-shadow trong 0.3s */
+  }
+  
+  /* Thay đổi text-shadow khi hover qua phần tử b */
+  b:hover {
+    text-shadow: 2px 2px 6px #ff00ff, -2px -2px 6px #7e0000; /* Hiệu ứng khi hover */
+  }
+  /* Định dạng màu nền mặc định cho nút */
+.btn-primary {
+  background-color: #800080; /* Màu tím (hoặc mã màu tùy chọn) */
+  transition: background-color 0.3s ease; /* Hiệu ứng chuyển đổi màu nền trong 0.3s */
+  border: 1px solid #aa0069; 
+}
+
+/* Hiệu ứng màu nền khi di chuột vào nút */
+.btn-primary:hover {
+  background-color: #4B0082; /* Màu tím khác khi hover */
+  transform: scale(1.1); /* Hiệu ứng phóng to */
+  color: #ac6efd;
+  border: 1px solid #7b00ac; 
+}
+
+  

@@ -27,7 +27,7 @@ function authPage(req, res, next) {
 
 function authRole(roles) {
   return (req, res, next) => {
-    const { user } = req; // Lấy thông tin người dùng từ yêu cầu
+    const { user } = req; // get user information from request
     if (!user) {
       res.status(401);
       return res.send('Not allowed');
@@ -36,7 +36,7 @@ function authRole(roles) {
     const userRoles = Array.isArray(user.role) ? user.role : [user.role];
     
     if (!Array.isArray(roles)) {
-      roles = [roles]; // Chuyển roles thành một mảng nếu nó không phải là mảng
+      roles = [roles]; // transfer role to array if it is not an array
     }
 
     if (!roles.some(role => userRoles.includes(role))) {

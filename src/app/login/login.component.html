@@ -1,32 +1,68 @@
-<div class="card">
+<div class="card" >
   
   <div class="container" >
     <h2>Welcome To <b>MessyMessage</b> </h2>
-<p>Please Login here!</p>
-  <div class="card-body" *ngIf="!loggedin">
-      <form  (submit)="signin($event)">
-          <div class="mb-3">
-              <label class="form-label">Username</label>
-              <input type="text" [(ngModel)]="email" name="email" class="form-control"  />
-            
-          </div>
-          <div class="mb-3">
-              <label class="form-label">Password</label>
-              <input type="password" [(ngModel)]="pwd" name="pwd" class="form-control"  />
-            
-          </div>
-          <div class="mb-3">
+    <div  *ngIf="registerstate">
+        <p>Please Register here!</p>
+    </div>
+    <div  *ngIf="!registerstate">
+        <p>Please Login here!</p>
+    </div>
+
+<div *ngIf="!registerstate">
+    <div class="card-body" *ngIf="!loggedin">
+        <form  (submit)="signin($event)">
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" [(ngModel)]="email" name="email" class="form-control"  />
               
-              <button type="button" class="btn btn-primary" type="submit">Submit</button>
-             
-          </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" [(ngModel)]="pwd" name="pwd" class="form-control"  />
+              
+            </div>
+            <div class="mb-3">
+                
+                <button type="button" class="btn btn-primary" type="submit">Submit</button>
+                
+               
+            </div>
+            <span (click)="register()" >Register here</span>
+            
+            <div id="errormsg">{{errormsg}}</div>
+        </form>
+    </div>
+</div>
+  
+  <div class="card-body" *ngIf="registerstate">
+    <form (submit)="createUser()">
+        <div class="mb-3">  
+        <label class="form-label" for="newUsername">Username:</label>
+        <input type="text" id="newUsername" [(ngModel)]="newUsername" name="newUsername" required  class="form-control" >
           
-          <div id="errormsg">{{errormsg}}</div>
+        </div>
+
+        <div class="mb-3">
+            <label  class="form-label" for="newEmail">Email:</label>
+            <input type="email" id="newEmail" [(ngModel)]="newEmail" name="newEmail" required  class="form-control" >
+        </div>
+        <div class="mb-3">
+            <label  class="form-label" for="newPassword">Password:</label>
+        <input type="password" id="newPassword" [(ngModel)]="newPassword" name="newPassword" required class="form-control" >
+    
+        </div>
+        
+        <button type="submit" class="btn btn-primary" (click)="turnedon()">Add </button>
+        <span (click)="dologin()">Login</span>
+        <div id="errormsg">{{errorregister}}</div>
+
       </form>
-  </div>
+
+</div>
   <div class="card-body" *ngIf="loggedin">
       <h3> You are already logged in.</h3>
-      <a href="/profile" >Home</a>
+      <a href="/profile" >Your Profile</a>
   <div class="tologout"> <a class="nav-link " href="" (click) ="logout($event)">Logout</a> </div>
 
   </div>

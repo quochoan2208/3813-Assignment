@@ -1,14 +1,33 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div class="container">
-    <h1> File Upload</h1>
-    <form>
-      <div class="form-group">
-    <input type="file" class="form-control" (change)="onFileSelected($event)" name="uploadfile" id = "uploadfile" />
-    
-    </div>
-    <button class="btn btn-primary" type="button" (click) ="onUpload()">Submit</button>
-    </form>
-    
-    <img src="http://localhost:3000\images\{{imagepath}} "/>
-    </div>
-  
+<div class="container-card">
+        <div class="centered-content">
+                <div *ngIf="!safeImageUrl" class="card-content">
+                        <div class="image-wrapper">
+                                <img [src]="urlbefore" *ngIf="!safeImageUrl"  width="300px" height="300px">
+                        </div>
+                        
+                        <h1>{{currentuser.username}}</h1>
+                        <h2>{{role}}</h2>
+                        <button (click)="editedimage()">Edit your Profile</button>
+                </div>
+                <div  *ngIf="safeImageUrl" class="card-content">
+                        <div class="image-wrapper">
+                                <img [src]="safeImageUrl" width="300px" height="300px" >
+                        </div>
+                        
+                        <h1>{{currentuser.username}}</h1>
+                        <h2>{{role}}</h2>
+                        <button (click)="editedimage()">Edit your Profile</button>
+                </div>
+                
+                <div *ngIf="edited" class="card-content2" >
+                        <input type="file" (change)="onFileSelected($event)" accept="image/*">
+                        <button (click)="displayImage()">Display Image</button>
+                </div>
+        </div>
+</div>
+
+
+
+
+        
+        

@@ -14,7 +14,7 @@ module.exports = function (app, path, fs) {
             const user = await User.findOne({ email: req.body.email, pwd: req.body.upwd });
 
             if (user) {
-                // Tìm thấy người dùng trong MongoDB, gửi thông tin người dùng về phía client
+                // found user in MongoDB, send user information to client
                 const customer = {
                     valid: true,
                     email: user.email,
@@ -24,7 +24,7 @@ module.exports = function (app, path, fs) {
                 };
                 res.send(customer);
             } else {
-                // Không tìm thấy người dùng, gửi thông báo về phía client
+                // not found user  , send back to client
                 const customer = {
                     valid: false,
                     email: '',

@@ -20,8 +20,18 @@
     
     padding: 20px;
     background-color: #1b013a;
+    background-image: url('../image/blue-rocket-png-9.png');
     
   }
+  .box-chat2 {
+    flex: 1.5;
+    
+    padding: 20px;
+    background-color: #1b013a;
+    background-image: url('../image/blue-rocket-png-9.png');
+    
+  }
+
 
   .user-list {
     flex: 0.5;
@@ -214,6 +224,7 @@ h3 {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
   }
   .input-text input {
     width: 50%;
@@ -227,9 +238,243 @@ h3 {
     height: 90%;
     background-color: #30008a;
     border-radius: 4px;
+    max-height: 500px; 
+    overflow-y: scroll;
+   
+   
+   
 
   }
   .tologout {
    position:sticky;
 
   }
+
+
+.message-container {
+  display: flex;
+  align-items: flex-start;
+  padding: 5px;
+  flex-direction: column;
+ 
+  margin: 5px;
+  border-radius: 10px;
+}
+.message-content {
+  max-width: 400px;
+  background-color: #9d82fd;
+  /* width: 100px; */
+  border-radius: 15px;
+  padding: 10px;
+  margin-top: -30px;
+ 
+  
+
+}
+.message-content p {
+  font-size: 16px;
+  color: #ffffff;
+}
+.message-sender h4 {
+  font-size: 14px;
+
+}
+/* Định dạng vùng tin nhắn */
+
+.message-content img {
+
+  border-radius: 5px;
+  max-width: 200px;
+  max-height: 200px;
+  
+
+}
+
+
+.message-sender {
+  flex: 1;
+  color: #fff;
+  
+ 
+}
+
+
+.message-content {
+  flex: 9;
+}
+
+
+.input-text button {
+  margin-top: -20px;
+}
+.input-text button:hover {
+
+  background-color: #4B0082;
+}
+.input-text input[type="file"] {
+  background-color: #15003d;
+  width: 102px;
+  height: 60%;
+}
+
+.private-chat-header {
+  text-align: center;
+  background-color: #555;
+  color: #fff;
+  padding: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.private-chat-messages {
+  max-height: 300px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.private-message {
+  margin: 5px;
+  padding: 5px;
+  
+  border-radius: 5px;
+  
+}
+
+
+.private-chat-input {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 20%;
+}
+
+.private-chat-input input {
+  flex: 1;
+  padding: 5px;
+  margin-right: 10px;
+  border-radius: 20px;
+}
+
+.private-chat-input button {
+  background-color: #555;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-top: -5px;
+}
+
+.private-chat-input button:hover {
+  background-color: #333;
+}
+
+.box-chat2 {
+  background-color: #470099;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-width: 400px; 
+  margin: 0 auto;
+  padding: 10px;
+  position: relative;
+}
+
+
+.box-chat2 button {
+  position: sticky;
+  top: 0;
+  z-index: 1; 
+  background-color: #630066; 
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.box-chat2 button:hover{
+  background-color: #ff3e78;
+  border-radius: 50px;
+  padding: 5px 15px;
+}
+
+.private-chat-header {
+  text-align: center;
+  background-color: #3b0088;
+  color: #ffffff;
+  padding: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-radius: 20px;
+}
+.the-top {
+  height: 80%;
+  background-color: #20005a;
+  padding: 20px;
+  padding-top: 10px;
+  border-radius: 20px;
+}
+.private-message {
+  display: flex;
+  flex-direction: column;
+}
+
+.sender-name2 {
+  font-weight: bold; 
+}
+
+.message-text2 {
+  max-width: 300px;
+  background-color: #9d82fd;
+  /* width: 100px; */
+  border-radius: 20px;
+  padding: 10px;
+  color: #fff;
+  
+}
+
+.chat-box3 {
+  flex: 1.5;
+  width: 80%;
+  
+  background-color: #1b013a;
+  background-image: url('../image/blue-rocket-png-9.png');
+  
+}
+
+.private-chat-input2 {
+  display: flex;
+  justify-content: space-between;
+  background-color: #2f0086;
+  align-items: center;
+  height: 20%;
+  padding: 20px;
+  padding-bottom: 10px;
+  border: 1px solid #ccc;
+  
+  
+}
+.private-chat-input2 button {
+ margin-top: -7px;
+}
+
+.message-text3 h4 {
+  font-size: 14px;
+  color: #fff;
+  text-align: left;
+}
+.message-text3 p {
+  font-size: 16px;
+  text-align: left;
+}
+
+.message-text3{
+  height: 90%;
+  background-color: #30008a;  
+  
+  padding: 30px;
+  max-height: 480px;
+  overflow-y: scroll;
+  margin-bottom: 20px;
+ 
+ 
+
+}
